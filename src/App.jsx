@@ -128,7 +128,7 @@ const MainLayout = ({ children }) => {
       <main className="flex-grow">{children}</main>
       
       {/* Sticky Footer */}
-      <footer className="footer-sticky bg-surface-800 text-white dark:bg-surface-900">
+      <footer className="bg-surface-800 text-white dark:bg-surface-900">
         <div className="container mx-auto px-4 py-10">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
             {/* Company Info */}
