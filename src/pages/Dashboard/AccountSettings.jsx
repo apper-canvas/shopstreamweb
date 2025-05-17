@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { toast } from 'react-toastify';
 import { getIcon } from '../../utils/iconUtils';
 import { useAuth } from '../../contexts/AuthContext';
+import { updateUserProfile } from '../../services/userService';
 import { FormSection, FormInput, FormDivider } from '../../components/FormComponents';
 
 // Import icons
@@ -119,16 +120,22 @@ export default function AccountSettings() {
     setIsSubmittingProfile(true);
     
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Get user ID from current user
+      const userId = currentUser?.id;
+      
+      if (!userId) {
+        throw new Error("User ID not found");
+      }
+      
+      // Update profile using userService
+      await updateUserProfile(userId, profileInfo);
       
       // Update user profile in context
       setCurrentUser(prev => ({
         ...prev,
-        name: profileInfo.name,
-        email: profileInfo.email,
-        phoneNumber: profileInfo.phoneNumber
+        ...profileInfo
       }));
+
       
       toast.success("Profile information updated successfully!");
     } catch (error) {
