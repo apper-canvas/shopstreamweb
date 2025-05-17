@@ -114,7 +114,9 @@ export default function Shop() {
   return (
     <div className="min-h-screen bg-surface-50 transition-colors dark:bg-surface-900">
       <main className="container mx-auto px-4 py-8">
-        <h1 className="mb-6 text-3xl font-bold text-surface-800 dark:text-white">{categoryName || (categoryParam ? `Category ${categoryParam}` : 'Shop')}</h1>
+        <h1 className="mb-6 text-3xl font-bold text-surface-800 dark:text-white">
+          {categoryName || (categoryParam ? `Category ${categoryParam}` : 'Shop')}
+        </h1>
         
         {loading ? (
           <div className="flex min-h-[300px] items-center justify-center">
@@ -123,99 +125,95 @@ export default function Shop() {
           </div>
         ) : (
           <>
-    <div className="min-h-screen bg-surface-50 transition-colors dark:bg-surface-900">
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="mb-6 text-3xl font-bold text-surface-800 dark:text-white">{categoryName || (categoryParam ? `Category ${categoryParam}` : 'Shop')}</h1>
-        
-        {/* Search and filter controls */}
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-          <form onSubmit={handleSearch} className="flex w-full flex-1 md:w-auto">
-            <div className="relative flex-1">
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-10 w-full rounded-l-lg border border-surface-300 bg-surface-100 pl-3 pr-10 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-surface-600 dark:bg-surface-700 dark:text-white"
-              />
-              <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 text-surface-500 hover:text-primary dark:text-surface-400">
-                <SearchIcon className="h-5 w-5" />
-              </button>
-            </div>
-            <button type="button" onClick={toggleFilter} className="inline-flex h-10 items-center rounded-r-lg bg-primary px-4 text-white hover:bg-primary-dark">
-              <FilterIcon className="h-5 w-5 mr-2" />
-              Filters
-            </button>
-          </form>
-          <div className="flex items-center gap-2">
-            <button onClick={() => setViewMode('grid')} className={`rounded p-2 ${viewMode === 'grid' ? 'bg-primary text-white' : 'bg-surface-200 text-surface-700 dark:bg-surface-700 dark:text-surface-300'}`}>
-              <GridIcon className="h-5 w-5" />
-            </button>
-            <button onClick={() => setViewMode('list')} className={`rounded p-2 ${viewMode === 'list' ? 'bg-primary text-white' : 'bg-surface-200 text-surface-700 dark:bg-surface-700 dark:text-surface-300'}`}>
-              <ListIcon className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-        
-        {/* Products grid */}
-        <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1'}`}>
-          {filteredProducts.map((product) => (
-            <Link key={product.id} to={`/product/${product.id}`} className="group overflow-hidden rounded-lg bg-white shadow-soft transition-all hover:shadow-md dark:bg-surface-800">
-              {viewMode === 'grid' ? (
-                <>
-                  <div className="aspect-square w-full overflow-hidden">
-                    <img 
-                      src={product.images && product.images.length > 0 ? product.images[0] : 'https://placehold.co/400x400/111827/FFFFFF?text=No+Image'} 
-                      alt={product.name} 
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      onError={(e) => {
-                        e.target.src = 'https://placehold.co/400x400/111827/FFFFFF?text=No+Image';
-                      }}
-                    />
-                  </div>
-                  <div className="p-4">
-                    <p className="text-sm text-surface-500 dark:text-surface-400">{product.category}</p>
-                    <h3 className="text-lg font-semibold text-surface-800 dark:text-white">{product.name}</h3>
-                    <p className="mt-2 text-xl font-bold text-primary">${product.price.toFixed(2)}</p>
-                  </div>
-                </>
-              ) : (
-                <div className="flex h-40">
-                  <img 
-                    src={product.images && product.images.length > 0 ? product.images[0] : 'https://placehold.co/200x200/111827/FFFFFF?text=No+Image'} 
-                    alt={product.name} 
-                    className="h-full w-40 object-cover"
-                    onError={(e) => {
-                      e.target.src = 'https://placehold.co/200x200/111827/FFFFFF?text=No+Image';
-                    }}
-                  />
-                  <div className="flex flex-1 flex-col justify-between p-4">
-                    <div>
-                      <p className="text-sm text-surface-500 dark:text-surface-400">{product.category}</p>
-                      <h3 className="text-lg font-semibold text-surface-800 dark:text-white">{product.name}</h3>
-                      {product.description && (
-                        <p className="mt-1 line-clamp-2 text-sm text-surface-600 dark:text-surface-400">
-                          {product.description}
-                        </p>
-                      )}
-                    </div>
-                    <p className="text-xl font-bold text-primary">${product.price.toFixed(2)}</p>
-                  </div>
-                </div>
-              )}
-            </Link>
-          ))}
-        </div>
-         
-        {filteredProducts.length === 0 && !loading && (
-          <div className="mt-8 text-center">
-            <p className="text-lg text-surface-600 dark:text-surface-400">
-              No products found. Try adjusting your search criteria.
-            </p>
-          </div>
-        )}
-        </>
-        )}
+             {/* Search and filter controls */}
+             <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+               <form onSubmit={handleSearch} className="flex w-full flex-1 md:w-auto">
+                 <div className="relative flex-1">
+                   <input
+                     type="text"
+                     placeholder="Search products..."
+                     value={searchQuery}
+                     onChange={(e) => setSearchQuery(e.target.value)}
+                     className="h-10 w-full rounded-l-lg border border-surface-300 bg-surface-100 pl-3 pr-10 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-surface-600 dark:bg-surface-700 dark:text-white"
+                   />
+                   <button type="submit" className="absolute right-2 top-1/2 -translate-y-1/2 text-surface-500 hover:text-primary dark:text-surface-400">
+                     <SearchIcon className="h-5 w-5" />
+                   </button>
+                 </div>
+                 <button type="button" onClick={toggleFilter} className="inline-flex h-10 items-center rounded-r-lg bg-primary px-4 text-white hover:bg-primary-dark">
+                   <FilterIcon className="h-5 w-5 mr-2" />
+                   Filters
+                 </button>
+               </form>
+               <div className="flex items-center gap-2">
+                 <button onClick={() => setViewMode('grid')} className={`rounded p-2 ${viewMode === 'grid' ? 'bg-primary text-white' : 'bg-surface-200 text-surface-700 dark:bg-surface-700 dark:text-surface-300'}`}>
+                   <GridIcon className="h-5 w-5" />
+                 </button>
+                 <button onClick={() => setViewMode('list')} className={`rounded p-2 ${viewMode === 'list' ? 'bg-primary text-white' : 'bg-surface-200 text-surface-700 dark:bg-surface-700 dark:text-surface-300'}`}>
+                   <ListIcon className="h-5 w-5" />
+                 </button>
+               </div>
+             </div>
+             
+             {/* Products grid */}
+             <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1'}`}>
+               {filteredProducts.map((product) => (
+                 <Link key={product.id} to={`/product/${product.id}`} className="group overflow-hidden rounded-lg bg-white shadow-soft transition-all hover:shadow-md dark:bg-surface-800">
+                   {viewMode === 'grid' ? (
+                     <>
+                       <div className="aspect-square w-full overflow-hidden">
+                         <img 
+                           src={product.images && product.images.length > 0 ? product.images[0] : 'https://placehold.co/400x400/111827/FFFFFF?text=No+Image'} 
+                           alt={product.name} 
+                           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                           onError={(e) => {
+                             e.target.src = 'https://placehold.co/400x400/111827/FFFFFF?text=No+Image';
+                           }}
+                         />
+                       </div>
+                       <div className="p-4">
+                         <p className="text-sm text-surface-500 dark:text-surface-400">{product.category}</p>
+                         <h3 className="text-lg font-semibold text-surface-800 dark:text-white">{product.name}</h3>
+                         <p className="mt-2 text-xl font-bold text-primary">${product.price.toFixed(2)}</p>
+                       </div>
+                     </>
+                   ) : (
+                     <div className="flex h-40">
+                       <img 
+                         src={product.images && product.images.length > 0 ? product.images[0] : 'https://placehold.co/200x200/111827/FFFFFF?text=No+Image'} 
+                         alt={product.name} 
+                         className="h-full w-40 object-cover"
+                         onError={(e) => {
+                           e.target.src = 'https://placehold.co/200x200/111827/FFFFFF?text=No+Image';
+                         }}
+                       />
+                       <div className="flex flex-1 flex-col justify-between p-4">
+                         <div>
+                           <p className="text-sm text-surface-500 dark:text-surface-400">{product.category}</p>
+                           <h3 className="text-lg font-semibold text-surface-800 dark:text-white">{product.name}</h3>
+                           {product.description && (
+                             <p className="mt-1 line-clamp-2 text-sm text-surface-600 dark:text-surface-400">
+                               {product.description}
+                             </p>
+                           )}
+                         </div>
+                         <p className="text-xl font-bold text-primary">${product.price.toFixed(2)}</p>
+                       </div>
+                     </div>
+                   )}
+                 </Link>
+               ))}
+             </div>
+              
+             {filteredProducts.length === 0 && !loading && (
+               <div className="mt-8 text-center">
+                 <p className="text-lg text-surface-600 dark:text-surface-400">
+                   No products found. Try adjusting your search criteria.
+                 </p>
+               </div>
+             )}
+           </>
+         )}
       </main>
     </div>
   );
