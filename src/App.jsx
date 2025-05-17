@@ -117,10 +117,10 @@ const MainLayout = ({ children }) => {
                 and exceptional service.
               </p>
               <div className="flex space-x-4">
-                <a 
-                  href="https://facebook.com" 
-                  target="_blank" 
-                  rel="noreferrer" 
+                <a
+                  href="https://facebook.com"
+                  target="_blank"
+                  rel="noreferrer"
                   className="text-gray-300 hover:text-white"
                   aria-label="Facebook"
                 >
