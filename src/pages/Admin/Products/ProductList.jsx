@@ -87,7 +87,14 @@ export default function ProductList() {
     if (!productToDelete) return;
     
     try {
-      await deleteProduct(productToDelete.id);
+      // Call the delete product method from context
+      const result = await deleteProduct(productToDelete.id);
+      
+      if (result) {
+        toast.success(`Product "${productToDelete.name}" has been deleted successfully`);
+      } else {
+        toast.error("Failed to delete product. Please try again.");
+      }
       setShowDeleteModal(false);
       setProductToDelete(null);
     } catch (error) {
