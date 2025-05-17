@@ -4,6 +4,10 @@ import { ToastContainer } from 'react-toastify';
 import { getIcon } from './utils/iconUtils';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
+import Shop from './pages/Shop';
+import Categories from './pages/Categories';
+import Deals from './pages/Deals';
+import About from './pages/About';
 import DashboardLayout from './pages/Dashboard/DashboardLayout';
 import DashboardHome from './pages/Dashboard/DashboardHome';
 import AccountSettings from './pages/Dashboard/AccountSettings';
@@ -68,6 +72,11 @@ function App() {
       {/* Application routes */}
       <Routes>
         <Route path="/" element={<Home />} />
+        {/* Shop, Categories, Deals, and About routes */}
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/categories" element={<Categories />} />
+        <Route path="/deals" element={<Deals />} />
+        <Route path="/about" element={<About />} />
         
         {/* Auth routes */}
         <Route path="/login" element={<Login />} />
