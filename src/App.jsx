@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation, useNavigate, Link, Outlet } from 'react-router-dom';
+import { useState, useEffect, createContext } from 'react';
+import { Routes, Route, Navigate, useLocation, useNavigate, Link, Outlet, useSearchParams } from 'react-router-dom';
 import { getIcon } from './utils/iconUtils';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
@@ -28,9 +28,13 @@ import SavedPayments from './pages/Dashboard/SavedPayments';
 import OrderHistory from './pages/Dashboard/OrderHistory';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
-import { CartProvider } from './contexts/CartContext';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import Callback from './pages/Auth/Callback';
+import ErrorPage from './pages/Auth/ErrorPage';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser, clearUser } from './store/userSlice';
+import UserDropdown from './components/UserDropdown';
 
+export const AuthContext = createContext(null);
 // Admin imports
 import AdminLayout from './pages/Admin/AdminLayout';
 import AdminDashboard from './pages/Admin/AdminDashboard';
@@ -48,15 +52,15 @@ const TwitterIcon = getIcon('Twitter');
 const InstagramIcon = getIcon('Instagram');
 
 // Protected route component to handle authentication
-const ProtectedRoute = ({ children }) => {
-  const { currentUser, loading } = useAuth();
+const ProtectedRoute = ({ children, redirectTo = "/login" }) => {
+  const { user, isAuthenticated } = useSelector((state) => state.user);
   const location = useLocation();
   
-  if (loading) {
+  if (user === undefined) {
     return <div className="flex h-screen items-center justify-center">Loading...</div>;
   }
   
-  if (!currentUser) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
   
@@ -65,16 +69,16 @@ const ProtectedRoute = ({ children }) => {
 
 // Admin route component to handle authentication for admin users
 const AdminRoute = ({ children }) => {
-  const { currentUser, loading } = useAuth();
+  const { user, isAuthenticated } = useSelector((state) => state.user);
   const location = useLocation();
   
-  if (loading) {
+  if (user === undefined) {
     return <div className="flex h-screen items-center justify-center">Loading...</div>;
   }
   
   // Check if user is logged in and has admin role
-  if (!currentUser || !currentUser.isAdmin) {
-    // Redirect to dashboard if user is logged in but not admin
+  if (!isAuthenticated || !user.isAdmin) {
+    // Redirect to dashboard if user is logged in but not admin, or login if not logged in
     const redirectPath = currentUser ? '/dashboard' : '/login';
     return <Navigate to={redirectPath} state={{ from: location }} replace />;
   }
@@ -83,9 +87,9 @@ const AdminRoute = ({ children }) => {
 };
 
 // Main layout component with sticky header and footer
-const MainLayout = ({ children }) => {
+const MainLayout = () => {
   const [email, setEmail] = useState('');
-  
+  const { user, isAuthenticated } = useSelector((state) => state.user);
   const handleSubscribe = (e) => {
     e.preventDefault();
     
@@ -98,6 +102,7 @@ const MainLayout = ({ children }) => {
     toast.success("You've been subscribed to our newsletter!");
     setEmail('');
   };
+
   return (
     <div className="flex min-h-screen flex-col">
       {/* Sticky Header */}
@@ -119,8 +124,9 @@ const MainLayout = ({ children }) => {
             </div>
             <div className="flex items-center space-x-4">
               <Link to="/cart" className="hover:text-primary">Cart</Link>
-              <Link to="/login" className="hover:text-primary">Login</Link>
-            </div>
+              {isAuthenticated ? (
+                <UserDropdown user={user} />
+              ) : <Link to="/login" className="hover:text-primary">Login</Link>}            </div>
           </div>
         </div>
       </header>
@@ -229,10 +235,15 @@ const MainLayout = ({ children }) => {
 };
 
 function App() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [darkMode, setDarkMode] = useState(() => {
     const savedMode = localStorage.getItem('darkMode');
     return savedMode ? JSON.parse(savedMode) : window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
+  const [isInitialized, setIsInitialized] = useState(false);
+  const { user, isAuthenticated } = useSelector((state) => state.user);
 
   // Apply dark mode class to html element
   useEffect(() => {
@@ -248,8 +259,101 @@ function App() {
     setDarkMode(prev => !prev);
   };
 
+  // Initialize ApperUI once when the app loads
+  useEffect(() => {
+    const { ApperClient, ApperUI } = window.ApperSDK;
+    const client = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+    
+    // Initialize but don't show login yet
+    ApperUI.setup(client, {
+      target: '#authentication',
+      clientId: import.meta.env.VITE_APPER_PROJECT_ID,
+      view: 'both',
+      onSuccess: function (user) {
+        setIsInitialized(true);
+        
+        // CRITICAL: This exact currentPath logic must be preserved in all implementations
+        // DO NOT simplify or modify this pattern as it ensures proper redirection flow
+        let currentPath = window.location.pathname + window.location.search;
+        let redirectPath = new URLSearchParams(window.location.search).get('redirect');
+        const isAuthPage = currentPath.includes('/login') || currentPath.includes('/signup') || currentPath.includes(
+            '/callback') || currentPath.includes('/error');
+        if (user) {
+          // User is authenticated
+          if (redirectPath) {
+            navigate(redirectPath);
+          } else if (!isAuthPage) {
+            if (!currentPath.includes('/login') && !currentPath.includes('/signup')) {
+              navigate(currentPath);
+            } else {
+              navigate('/dashboard');
+            }
+          } else {
+            navigate('/dashboard');
+          }
+          // Store user information in Redux
+          dispatch(setUser(JSON.parse(JSON.stringify(user))));
+        } else {
+          // User is not authenticated
+          if (!isAuthPage) {
+            navigate(
+              currentPath.includes('/signup')
+               ? `/signup?redirect=${currentPath}`
+               : currentPath.includes('/login')
+               ? `/login?redirect=${currentPath}`
+               : '/login');
+          } else if (redirectPath) {
+            if (
+              ![
+                'error',
+                'signup',
+                'login',
+                'callback'
+              ].some((path) => currentPath.includes(path)))
+              navigate(`/login?redirect=${redirectPath}`);
+            else {
+              navigate(currentPath);
+            }
+          } else if (isAuthPage) {
+            navigate(currentPath);
+          } else {
+            navigate('/login');
+          }
+          dispatch(clearUser());
+        }
+      },
+      onError: function(error) {
+        console.error("Authentication failed:", error);
+        navigate('/error?message=' + encodeURIComponent(error.message || 'Authentication failed'));
+      }
+    });
+  }, [dispatch, navigate]);
+
+  // Authentication methods to share via context
+  const authMethods = {
+    isInitialized,
+    logout: async () => {
+      try {
+        const { ApperUI } = window.ApperSDK;
+        await ApperUI.logout();
+        dispatch(clearUser());
+        navigate('/login');
+      } catch (error) {
+        console.error("Logout failed:", error);
+      }
+    }
+  };
+
+  // Don't render routes until initialization is complete
+  if (!isInitialized) {
+    return <div className="flex h-screen items-center justify-center">Initializing application...</div>;
+  }
+
   return (
-    <>
+    <AuthContext.Provider value={authMethods}>
       <button
         onClick={toggleDarkMode}
         className="fixed right-4 top-4 z-50 rounded-full bg-surface-200 p-2 text-surface-800 shadow-md transition-all hover:bg-surface-300 dark:bg-surface-700 dark:text-surface-100 dark:hover:bg-surface-600"
@@ -267,7 +371,7 @@ function App() {
           <Route path="deals" element={<Deals />} />
           <Route path="about" element={<About />} />
           <Route path="cart" element={<Cart />} />
-          <Route path="checkout" element={<Checkout />} />
+          <Route path="checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
           <Route path="order-confirmation/:orderId" element={<OrderConfirmation />} />
           <Route path="track-order" element={<OrderTracking />} />
           <Route path="product/:id" element={<ProductDetail />} />
@@ -284,7 +388,9 @@ function App() {
 
         {/* Auth routes without MainLayout */}
         <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/signup" element={<Register />} />
+        <Route path="/callback" element={<Callback />} />
+        <Route path="/error" element={<ErrorPage />} />
 
         {/* Protected dashboard routes */}
         <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
@@ -309,7 +415,7 @@ function App() {
       </Routes>
       <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar={false} />
 
-    </>
+    </AuthContext.Provider>
   );
 }
 
@@ -317,11 +423,7 @@ function App() {
 // Wrap the App component with AuthProvider
 function AppWithAuth() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <App />
-      </CartProvider>
-    </AuthProvider>
+    <App />
   );
 }
 
