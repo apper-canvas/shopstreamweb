@@ -75,16 +75,31 @@ export default function Shop() {
   ];
 
   // Category mapping from numeric ID to category name
-  const categoryMapping = (categoryId) => {
+  const categoryMapping = {
+    "1": "Electronics",
+    "2": "Fashion",
+    "3": "Home & Garden",
+    "4": "Beauty",
+    "5": "Sports",
+    "6": "Toys" 
+  };
+
+  // Get category name by ID
+  const getCategoryNameById = (categoryId) => {
+    return categoryMapping[categoryId] || null;
+  };
+
+  // Map Home's categories to product categories
+  const mapToProductCategory = (categoryName) => {
     const categories = {
-      "1": "Electronics",
-      "2": "Fashion",
-      "3": "Home & Garden",
-      "4": "Beauty",
-      "5": "Sports",
-      "6": "Toys" 
+      "Electronics": "Electronics",
+      "Fashion": "Fashion",
+      "Home & Garden": "Home",
+      "Beauty": "Beauty",
+      "Sports": "Sports",
+      "Toys": "Toys"
     };
-    return categories[categoryId] || null;
+    return categories[categoryName] || categoryName;
   };
 
   // Filter products based on category from URL parameter
@@ -94,15 +109,23 @@ export default function Shop() {
 
   useEffect(() => {
     if (categoryParam) { 
-      // Check if categoryParam is a number (from Home.jsx) or a string (direct category name)
-      const mappedCategory = !isNaN(categoryParam) ? categoryMapping(categoryParam) : null;
-      
-      if (mappedCategory) {
-        setFilteredProducts(products.filter(product => product.category === mappedCategory));
-        setCategoryName(mappedCategory);
+      let mappedCategory = null;
+
+      // Check if categoryParam is a numeric ID (from Home.jsx)
+      if (!isNaN(categoryParam)) {
+        // Get the category name from the ID
+        mappedCategory = getCategoryNameById(categoryParam);
+        
+        if (mappedCategory) {
+          // Map the category name to match product categories
+          const productCategory = mapToProductCategory(mappedCategory);
+          setFilteredProducts(products.filter(product => product.category === productCategory));
+          setCategoryName(mappedCategory);
+        }
       } else {
+        // Direct category name (from direct URL or Categories.jsx)
         setFilteredProducts(products.filter(product => product.category === categoryParam));
-        setCategoryName(categoryParam);
+        setCategoryName(mappedCategory);
       }
     } else {
       setFilteredProducts(products);
