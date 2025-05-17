@@ -240,6 +240,104 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Address Management
+  const addAddress = (newAddress) => {
+    try {
+      // Make sure user is logged in
+      if (!currentUser) {
+        throw new Error('You must be logged in to add an address');
+      }
+      
+      // Make sure address has all required fields
+      if (!newAddress.street || !newAddress.city || !newAddress.state || 
+          !newAddress.zipCode || !newAddress.country) {
+        throw new Error('Invalid address data');
+      }
+      
+      // Create a copy of the user's addresses or initialize if none exist
+      const updatedAddresses = [...(currentUser.addresses || [])];
+      
+      // If this is set as default, update all others
+      if (newAddress.isDefault) {
+        updatedAddresses.forEach(address => address.isDefault = false);
+      }
+      
+      // Create a new address with ID
+      const addressWithId = {
+        ...newAddress,
+        id: `addr-${Date.now()}`
+      };
+      
+      // Add the new address
+      updatedAddresses.push(addressWithId);
+      
+      // Update user object
+      setCurrentUser({
+        ...currentUser,
+        addresses: updatedAddresses
+      });
+      
+      toast.success('Address added successfully!');
+      return true;
+    } catch (error) {
+      toast.error(error.message || 'Failed to add address');
+      return false;
+    }
+  };
+  
+  const updateAddress = (updatedAddress) => {
+    try {
+      if (!currentUser) {
+        throw new Error('You must be logged in to update an address');
+      }
+      
+      const updatedAddresses = currentUser.addresses.map(address => {
+        if (address.id === updatedAddress.id) {
+          return { ...updatedAddress };
+        }
+        
+        // If updated address is set as default, make other addresses not default
+        if (updatedAddress.isDefault) {
+          return { ...address, isDefault: false };
+        }
+        
+        return address;
+      });
+      
+      setCurrentUser({
+        ...currentUser,
+        addresses: updatedAddresses
+      });
+      
+      toast.success('Address updated successfully!');
+      return true;
+    } catch (error) {
+      toast.error(error.message || 'Failed to update address');
+      return false;
+    }
+  };
+  
+  const deleteAddress = (id) => {
+    try {
+      if (!currentUser) {
+        throw new Error('You must be logged in to delete an address');
+      }
+      
+      const updatedAddresses = currentUser.addresses.filter(address => address.id !== id);
+      
+      setCurrentUser({
+        ...currentUser,
+        addresses: updatedAddresses
+      });
+      
+      toast.success('Address deleted successfully!');
+      return true;
+    } catch (error) {
+      toast.error(error.message || 'Failed to delete address');
+      return false;
+    }
+  };
+  
   const value = { 
     currentUser, 
     loading, 
@@ -250,7 +348,10 @@ export function AuthProvider({ children }) {
     addPaymentMethod,
     updatePaymentMethod,
     deletePaymentMethod,
-    setDefaultPaymentMethod
+    setDefaultPaymentMethod,
+    addAddress,
+    updateAddress,
+    deleteAddress
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -16,7 +16,7 @@ const CheckCircle = getIcon('CheckCircle');
 
 export default function SavedAddresses() {
   const { currentUser, setCurrentUser } = useAuth();
-  const [addresses, setAddresses] = useState(currentUser?.addresses || []);
+  const { currentUser, updateAddress, addAddress, deleteAddress } = useAuth();
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState(null);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(null);
@@ -58,8 +58,8 @@ export default function SavedAddresses() {
       state: '',
       zipCode: '',
       country: 'United States',
-      isDefault: addresses.length === 0 // Make default if it's the first address
-    });
+      country: 'United States', 
+      isDefault: currentUser?.addresses?.length === 0 // Make default if it's the first address
     setEditingAddressId(null);
     setShowAddressForm(true);
     setErrors({});
@@ -110,47 +110,18 @@ export default function SavedAddresses() {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      let updatedAddresses;
-      
       if (editingAddressId) {
-        // Update existing address
-        updatedAddresses = addresses.map(addr => 
-          addr.id === editingAddressId ? { ...addressForm, id: editingAddressId } : addr
-        );
-        toast.success("Address updated successfully!");
+        // Update existing address  
+        await updateAddress({ ...addressForm, id: editingAddressId });
       } else {
         // Add new address
-        const newAddress = {
-          ...addressForm,
-          id: `addr-${Date.now()}`
-        };
-        
-        updatedAddresses = [...addresses, newAddress];
-        toast.success("Address added successfully!");
+        await addAddress(addressForm);
       }
-      
-      // If the current address is set as default, update other addresses
-      if (addressForm.isDefault) {
-        updatedAddresses = updatedAddresses.map(addr => ({
-          ...addr,
-          isDefault: addr.id === (editingAddressId || `addr-${Date.now()}`)
-        }));
-      }
-      
-      setAddresses(updatedAddresses);
-      
-      // Update user context
-      setCurrentUser(prev => ({
-        ...prev,
-        addresses: updatedAddresses
-      }));
       
       // Close the form
       setShowAddressForm(false);
       setEditingAddressId(null);
+      setAddressForm({ type: 'Home', street: '', city: '', state: '', zipCode: '', country: 'United States', isDefault: false });
     } catch (error) {
       toast.error("Failed to save address");
     } finally {
@@ -160,29 +131,12 @@ export default function SavedAddresses() {
   
   // Handle address deletion
   const handleDeleteAddress = async (addressId) => {
+    setShowDeleteConfirm(null);
+    
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      const updatedAddresses = addresses.filter(addr => addr.id !== addressId);
-      
-      // If we're deleting the default address, make the first remaining address the default
-      if (addresses.find(addr => addr.id === addressId)?.isDefault && updatedAddresses.length > 0) {
-        updatedAddresses[0].isDefault = true;
-      }
-      
-      setAddresses(updatedAddresses);
-      
-      // Update user context
-      setCurrentUser(prev => ({
-        ...prev,
-        addresses: updatedAddresses
-      }));
-      
-      toast.success("Address deleted successfully!");
-      setShowDeleteConfirm(null);
+      await deleteAddress(addressId);
     } catch (error) {
-      toast.error("Failed to delete address");
+      toast.error(error.message || "Failed to delete address");
     }
   };
 
@@ -350,7 +304,7 @@ export default function SavedAddresses() {
         </div>
       )}
       
-      {addresses.length === 0 ? (
+      {!currentUser?.addresses?.length ? (
         <div className="card flex flex-col items-center justify-center py-12">
           <MapPin className="mb-4 h-16 w-16 text-surface-400" />
           <h3 className="mb-2 text-xl font-medium text-surface-900 dark:text-white">No Addresses Saved</h3>
@@ -364,7 +318,7 @@ export default function SavedAddresses() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {addresses.map((address) => (
+          {currentUser.addresses.map((address) => (
             <div key={address.id} className="card">
               <div className="mb-4 flex items-start justify-between">
                 <div className="flex items-center space-x-2">
