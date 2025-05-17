@@ -74,13 +74,36 @@ export default function Shop() {
     }
   ];
 
+  // Category mapping from numeric ID to category name
+  const categoryMapping = (categoryId) => {
+    const categories = {
+      "1": "Electronics",
+      "2": "Fashion",
+      "3": "Home & Garden",
+      "4": "Beauty",
+      "5": "Sports",
+      "6": "Toys" 
+    };
+    return categories[categoryId] || null;
+  };
+
   // Filter products based on category from URL parameter
   const [filteredProducts, setFilteredProducts] = useState(products);
   const categoryParam = searchParams.get('category');
+  const [categoryName, setCategoryName] = useState('');
 
   useEffect(() => {
-    if (categoryParam) {
-      setFilteredProducts(products.filter(product => product.category === categoryParam));
+    if (categoryParam) { 
+      // Check if categoryParam is a number (from Home.jsx) or a string (direct category name)
+      const mappedCategory = !isNaN(categoryParam) ? categoryMapping(categoryParam) : null;
+      
+      if (mappedCategory) {
+        setFilteredProducts(products.filter(product => product.category === mappedCategory));
+        setCategoryName(mappedCategory);
+      } else {
+        setFilteredProducts(products.filter(product => product.category === categoryParam));
+        setCategoryName(categoryParam);
+      }
     } else {
       setFilteredProducts(products);
     }
@@ -98,7 +121,7 @@ export default function Shop() {
   return (
     <div className="min-h-screen bg-surface-50 transition-colors dark:bg-surface-900">
       <main className="container mx-auto px-4 py-8">
-        <h1 className="mb-6 text-3xl font-bold text-surface-800 dark:text-white">{categoryParam ? `${categoryParam}` : 'Shop'}</h1>
+        <h1 className="mb-6 text-3xl font-bold text-surface-800 dark:text-white">{categoryName || (categoryParam ? `Category ${categoryParam}` : 'Shop')}</h1>
         
         {/* Search and filter controls */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
