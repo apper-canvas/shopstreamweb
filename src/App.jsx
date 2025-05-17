@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
 import { getIcon } from './utils/iconUtils';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
@@ -108,19 +107,6 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
 
-      {/* Toast notification container */}
-      <ToastContainer
-        position="bottom-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme={darkMode ? 'dark' : 'light'}
-      />
     </>
   );
 }

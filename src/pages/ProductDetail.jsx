@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getIcon } from '../utils/iconUtils';
-import { toast } from 'react-toastify';
 import { useCart } from '../contexts/CartContext';
 
 const ShoppingCartIcon = getIcon('ShoppingCart');
@@ -54,7 +53,7 @@ export default function ProductDetail() {
   };
 
   const handleAddToWishlist = () => {
-    toast.info(`${product.name} added to your wishlist!`);
+    // Wishlist functionality without toast notification
   };
 
   if (loading) {

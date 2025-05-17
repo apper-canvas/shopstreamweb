@@ -1,5 +1,4 @@
 import { createContext, useState, useContext, useEffect } from 'react';
-import { toast } from 'react-toastify';
 
 const CartContext = createContext(null);
 
@@ -28,7 +27,6 @@ export function CartProvider({ children }) {
   const addToCart = (product, quantity = 1, size = null) => {
     // Check if product has sizes and requires selection
     if (product.sizes && product.sizes.length > 0 && !size) {
-      toast.warning("Please select a size first");
       return false;
     }
     
@@ -54,7 +52,6 @@ export function CartProvider({ children }) {
       }]);
     }
     
-    toast.success(`Added ${product.name} to cart`);
     return true;
   };
 
@@ -82,13 +79,11 @@ export function CartProvider({ children }) {
     );
     
     setCartItems(updatedCart);
-    toast.info("Item removed from cart");
   };
 
   // Clear the entire cart
   const clearCart = () => {
     setCartItems([]);
-    toast.info("Cart cleared");
   };
 
   // Get total number of items in cart
@@ -117,17 +112,15 @@ export function CartProvider({ children }) {
   const checkout = () => {
     // In a real app, this would handle payment processing or redirect to checkout
     if (cartItems.length === 0) {
-      toast.warning("Your cart is empty");
       return false;
     }
 
-    toast.info("Proceeding to checkout");
+    // Checkout functionality without toast notification
     return true;
   };
 
   // Place order function
   const placeOrder = (shippingInfo, paymentInfo) => {
-    if (cartItems.length === 0) {
       toast.warning("Your cart is empty");
       return { success: false };
     }
@@ -154,7 +147,6 @@ export function CartProvider({ children }) {
       setLastOrderId(orderId);
       return { success: true, orderId };
     } catch (error) {
-      toast.error("Failed to place order. Please try again.");
       return { success: false, error };
     }
   };

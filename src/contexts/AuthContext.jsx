@@ -1,5 +1,4 @@
 import { createContext, useState, useContext, useEffect } from 'react';
-import { toast } from 'react-toastify';
 
 const AuthContext = createContext(null);
 
@@ -77,10 +76,8 @@ export function AuthProvider({ children }) {
       
       // Login successful
       setCurrentUser(DUMMY_USER);
-      toast.success('Login successful!');
       return true;
     } catch (error) {
-      toast.error(error.message || 'Login failed');
       return false;
     } finally {
       setLoading(false);
@@ -105,10 +102,8 @@ export function AuthProvider({ children }) {
       };
       
       setCurrentUser(newUser);
-      toast.success('Registration successful!');
       return true;
     } catch (error) {
-      toast.error(error.message || 'Registration failed');
       return false;
     } finally {
       setLoading(false);
@@ -117,7 +112,6 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     setCurrentUser(null);
-    toast.info('You have been logged out');
   };
 
   // Payment Methods Management
@@ -153,7 +147,6 @@ export function AuthProvider({ children }) {
       
       return true;
     } catch (error) {
-      toast.error(error.message || 'Failed to add payment method');
       return false;
     }
   };
@@ -185,7 +178,6 @@ export function AuthProvider({ children }) {
       
       return true;
     } catch (error) {
-      toast.error(error.message || 'Failed to update payment method');
       return false;
     }
   };
@@ -212,7 +204,6 @@ export function AuthProvider({ children }) {
       
       return true;
     } catch (error) {
-      toast.error(error.message || 'Failed to delete payment method');
       return false;
     }
   };
@@ -235,7 +226,6 @@ export function AuthProvider({ children }) {
       
       return true;
     } catch (error) {
-      toast.error(error.message || 'Failed to set default payment method');
       return false;
     }
   };
@@ -277,10 +267,8 @@ export function AuthProvider({ children }) {
         addresses: updatedAddresses
       });
       
-      toast.success('Address added successfully!');
       return true;
     } catch (error) {
-      toast.error(error.message || 'Failed to add address');
       return false;
     }
   };
@@ -309,10 +297,8 @@ export function AuthProvider({ children }) {
         addresses: updatedAddresses
       });
       
-      toast.success('Address updated successfully!');
       return true;
     } catch (error) {
-      toast.error(error.message || 'Failed to update address');
       return false;
     }
   };
@@ -330,10 +316,8 @@ export function AuthProvider({ children }) {
         addresses: updatedAddresses
       });
       
-      toast.success('Address deleted successfully!');
       return true;
     } catch (error) {
-      toast.error(error.message || 'Failed to delete address');
       return false;
     }
   };

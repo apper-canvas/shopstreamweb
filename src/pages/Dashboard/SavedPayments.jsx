@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { toast } from 'react-toastify'; 
 import { getIcon } from '../../utils/iconUtils';
 
 // Get icons
@@ -188,7 +187,6 @@ export default function SavedPayments() {
       const success = deletePaymentMethod(id);
       if (success) {
         setPaymentMethods(prev => prev.filter(method => method.id !== id));
-        toast.success('Payment method deleted successfully');
       }
     }
   };
@@ -202,7 +200,6 @@ export default function SavedPayments() {
           isDefault: method.id === id
         }))
       );
-      toast.success('Default payment method updated');
     }
   };
   
@@ -211,7 +208,6 @@ export default function SavedPayments() {
     
     // Validate form
     if (!validateForm()) {
-      toast.error('Please fix the errors in the form');
       return;
     }
     
@@ -243,7 +239,6 @@ export default function SavedPayments() {
             return formData.isDefault ? { ...method, isDefault: false } : method;
           })
         );
-        toast.success('Payment method updated successfully');
       }
     } else {
       // Add new payment method
@@ -271,7 +266,6 @@ export default function SavedPayments() {
         } else {
           setPaymentMethods(prev => [...prev, newMethod]);
         }
-        toast.success('Payment method added successfully');
       }
     }
     
