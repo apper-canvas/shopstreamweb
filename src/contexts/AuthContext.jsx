@@ -39,7 +39,6 @@ const DUMMY_USER = {
       expiryYear: "2024",
       isDefault: true
     }
-  ],
   ]
 };
 
