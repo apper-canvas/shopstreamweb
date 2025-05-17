@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { getIcon } from '../utils/iconUtils';
@@ -21,13 +21,16 @@ export default function Home() {
   const toggleMobileMenu = () => {
     setMobileMenuOpen(prev => !prev);
   };
+
+  const toggleUserMenu = () => {
+    setShowUserMenu(prev => !prev);
+  };
   
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-  
-  const toggleUserMenu = () => {
-    setShowUserMenu(prev => !prev);
+      toast.info(`Searching for "${searchQuery}"`);
+    }
   };
 
   // Close the user menu when clicking outside
@@ -41,9 +44,6 @@ export default function Home() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-      toast.info(`Searching for "${searchQuery}"`);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-surface-50 transition-colors dark:bg-surface-900">
