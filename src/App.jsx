@@ -31,6 +31,11 @@ import Register from './pages/Auth/Register';
 import { CartProvider } from './contexts/CartContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
+// Admin imports
+import AdminLayout from './pages/Admin/AdminLayout';
+import AdminDashboard from './pages/Admin/AdminDashboard';
+import ProductList from './pages/Admin/Products/ProductList';
+import ProductForm from './pages/Admin/Products/ProductForm';
 // Import toast for notifications
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -53,6 +58,25 @@ const ProtectedRoute = ({ children }) => {
   
   if (!currentUser) {
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  
+  return children;
+};
+
+// Admin route component to handle authentication for admin users
+const AdminRoute = ({ children }) => {
+  const { currentUser, loading } = useAuth();
+  const location = useLocation();
+  
+  if (loading) {
+    return <div className="flex h-screen items-center justify-center">Loading...</div>;
+  }
+  
+  // Check if user is logged in and has admin role
+  if (!currentUser || !currentUser.isAdmin) {
+    // Redirect to dashboard if user is logged in but not admin
+    const redirectPath = currentUser ? '/dashboard' : '/login';
+    return <Navigate to={redirectPath} state={{ from: location }} replace />;
   }
   
   return children;
@@ -280,6 +304,16 @@ function App() {
             <Route path="orders" element={<OrderHistory />} />
             <Route path="orders/:orderId" element={<OrderDetails />} />
           </Route>
+
+          {/* Admin routes */}
+          <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+            <Route index element={<AdminDashboard />} />
+            <Route path="products" element={<ProductList />} />
+            <Route path="products/new" element={<ProductForm />} />
+            <Route path="products/edit/:id" element={<ProductForm />} />
+          </Route>
+
+          {/* 404 route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </MainLayout>
