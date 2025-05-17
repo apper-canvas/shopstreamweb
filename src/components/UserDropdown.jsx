@@ -31,36 +31,43 @@ export default function UserDropdown() {
   };
 
   return (
-    <div className="absolute right-0 top-full z-50 mt-1 w-56 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-surface-800 dark:ring-surface-700">
-      <div className="border-b border-surface-200 px-4 py-3 dark:border-surface-700">
+    <ul role="menu" className="absolute right-0 top-full z-50 mt-1 w-56 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-surface-800 dark:ring-surface-700">
+      <li className="border-b border-surface-200 px-4 py-3 dark:border-surface-700">
         <p className="text-sm font-medium text-surface-900 dark:text-white">
           {currentUser ? `Hello, ${currentUser.name.split(' ')[0]}!` : 'Welcome!'}
         </p>
         <p className="truncate text-xs text-surface-500 dark:text-surface-400" title={currentUser?.email || 'user@example.com'}>
           {currentUser?.email || 'user@example.com'}
         </p>
-      </div>
+      </li>
       
-      <div className="py-1">
+      <li className="py-1">
         {/* Menu items */}
         {menuItems.map((item, index) => (
-          <Link 
-            key={index} 
-            to={item.link} 
-            className="flex items-center px-4 py-2 text-sm text-surface-700 hover:bg-surface-100 dark:text-surface-300 dark:hover:bg-surface-700"
-          >
-            <item.icon className="mr-3 h-4 w-4" />
-            {item.text}
-          </Link>
+          <li key={index} role="menuitem">
+            <Link 
+              to={item.link} 
+              className="flex items-center px-4 py-2 text-sm text-surface-700 hover:bg-surface-100 dark:text-surface-300 dark:hover:bg-surface-700"
+            >
+              <item.icon className="mr-3 h-4 w-4" />
+              {item.text}
+            </Link>
+          </li>
         ))}
-        <button 
-          onClick={handleLogout} 
-          className="flex w-full items-center px-4 py-2 text-sm text-secondary hover:bg-surface-100 dark:hover:bg-surface-700"
-          aria-label="Sign Out"
-        >
-          <LogOut className="mr-3 h-4 w-4" /> {currentUser ? "Sign Out" : "Sign In"}
-        </button>
-      </div>
-    </div>
+        <li role="menuitem">
+          <a 
+            href="#" 
+            onClick={(e) => {
+              e.preventDefault();
+              handleLogout();
+            }} 
+            className="flex w-full items-center px-4 py-2 text-sm text-secondary hover:bg-surface-100 dark:hover:bg-surface-700"
+            aria-label="Sign Out"
+          >
+            <LogOut className="mr-3 h-4 w-4" /> {currentUser ? "Sign Out" : "Sign In"}
+          </a>
+        </li>
+      </li>
+    </ul>
   );
 }
