@@ -48,7 +48,8 @@ export const updateUserProfile = async (userId, userData) => {
 
     const tableName = 'User4';
     
-    // Only include fields that are updateable
+    // Map client-side field names to the exact field names in the Apper table
+    // This is crucial for the API to recognize the fields
     const updateableFields = {
       Name: userData.name,
       email: userData.email,
@@ -56,22 +57,22 @@ export const updateUserProfile = async (userId, userData) => {
     };
     
     // Remove any undefined fields
-    Object.keys(updateableFields).forEach(key => 
-      updateableFields[key] === undefined && delete updateableFields[key]
+    Object.keys(updateableFields).forEach(key =>
+      (updateableFields[key] === undefined || updateableFields[key] === null) && delete updateableFields[key]
     );
     
-    // Update the user record
-    const response = await apperClient.updateRecord(tableName, { 
+    // Update the user record with the proper format
+    const response = await apperClient.updateRecord(tableName, {
       records: [{
         Id: userId,
         ...updateableFields
       }]
     });
     
-    if (response && response.success && response.results && response.results.length > 0) {
-      return response.results[0].data;
+    if (response && response.success && response.results && response.results.some(result => result.success)) {
+      const successResult = response.results.find(result => result.success);
+      return successResult.data;
     }
-    
     throw new Error('Failed to update user profile');
   } catch (error) {
     console.error('Error updating user profile:', error);
