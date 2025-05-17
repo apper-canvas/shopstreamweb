@@ -11,6 +11,14 @@ import OrderTracking from './pages/OrderTracking';
 import OrderDetails from './pages/OrderDetails';
 import Cart from './pages/Cart';
 import ProductDetail from './pages/ProductDetail';
+import TermsOfService from './pages/TermsOfService';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import FAQ from './pages/FAQ';
+import Contact from './pages/Contact';
+import Careers from './pages/Careers';
+import ReturnPolicy from './pages/ReturnPolicy';
+import ShippingInfo from './pages/ShippingInfo';
+import Newsletter from './pages/Newsletter';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import DashboardLayout from './pages/Dashboard/DashboardLayout';
@@ -24,9 +32,16 @@ import Register from './pages/Auth/Register';
 import { CartProvider } from './contexts/CartContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
+// Import toast for notifications
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 // Get icon components
 const MoonIcon = getIcon('Moon');
 const SunIcon = getIcon('Sun');
+const FacebookIcon = getIcon('Facebook');
+const TwitterIcon = getIcon('Twitter');
+const InstagramIcon = getIcon('Instagram');
 
 // Protected route component to handle authentication
 const ProtectedRoute = ({ children }) => {
@@ -46,6 +61,20 @@ const ProtectedRoute = ({ children }) => {
 
 // Main layout component with sticky header and footer
 const MainLayout = ({ children }) => {
+  const [email, setEmail] = useState('');
+  
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    
+    // Email validation
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    
+    toast.success("You've been subscribed to our newsletter!");
+    setEmail('');
+  };
   return (
     <div className="flex min-h-screen flex-col">
       {/* Sticky Header */}
@@ -77,9 +106,99 @@ const MainLayout = ({ children }) => {
       <main className="flex-grow">{children}</main>
       
       {/* Sticky Footer */}
-      <footer className="footer-sticky bg-surface-800 py-6 text-white dark:bg-surface-900">
-        <div className="container mx-auto px-4 text-center">
-          <p>© {new Date().getFullYear()} ShopStream. All rights reserved.</p>
+      <footer className="footer-sticky bg-surface-800 text-white dark:bg-surface-900">
+        <div className="container mx-auto px-4 py-10">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-5">
+            {/* Company Info */}
+            <div className="col-span-1 lg:col-span-1">
+              <h3 className="mb-4 text-lg font-bold">ShopStream</h3>
+              <p className="mb-4 text-sm text-gray-300">
+                Your premier destination for modern shopping experiences with quality products
+                and exceptional service.
+              </p>
+              <div className="flex space-x-4">
+                <a 
+                  href="https://facebook.com" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="text-gray-300 hover:text-white"
+                  aria-label="Facebook"
+                >
+                  <FacebookIcon size={20} />
+                </a>
+                <a 
+                  href="https://twitter.com" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="text-gray-300 hover:text-white"
+                  aria-label="Twitter"
+                >
+                  <TwitterIcon size={20} />
+                </a>
+                <a 
+                  href="https://instagram.com" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="text-gray-300 hover:text-white"
+                  aria-label="Instagram"
+                >
+                  <InstagramIcon size={20} />
+                </a>
+              </div>
+            </div>
+            
+            {/* Shop Links */}
+            <div className="col-span-1">
+              <h3 className="mb-4 text-lg font-bold">Shop</h3>
+              <ul className="space-y-2 text-sm">
+                <li><a href="/shop" className="text-gray-300 hover:text-white">All Products</a></li>
+                <li><a href="/categories" className="text-gray-300 hover:text-white">Categories</a></li>
+                <li><a href="/deals" className="text-gray-300 hover:text-white">Deals & Offers</a></li>
+                <li><a href="/track-order" className="text-gray-300 hover:text-white">Order Tracking</a></li>
+              </ul>
+            </div>
+            
+            {/* Customer Support */}
+            <div className="col-span-1">
+              <h3 className="mb-4 text-lg font-bold">Support</h3>
+              <ul className="space-y-2 text-sm">
+                <li><a href="/contact" className="text-gray-300 hover:text-white">Contact Us</a></li>
+                <li><a href="/faq" className="text-gray-300 hover:text-white">FAQ</a></li>
+                <li><a href="/shipping-info" className="text-gray-300 hover:text-white">Shipping Information</a></li>
+                <li><a href="/return-policy" className="text-gray-300 hover:text-white">Returns & Refunds</a></li>
+              </ul>
+            </div>
+            
+            {/* Company Links */}
+            <div className="col-span-1">
+              <h3 className="mb-4 text-lg font-bold">Company</h3>
+              <ul className="space-y-2 text-sm">
+                <li><a href="/about" className="text-gray-300 hover:text-white">About Us</a></li>
+                <li><a href="/careers" className="text-gray-300 hover:text-white">Careers</a></li>
+                <li><a href="/terms-of-service" className="text-gray-300 hover:text-white">Terms of Service</a></li>
+                <li><a href="/privacy-policy" className="text-gray-300 hover:text-white">Privacy Policy</a></li>
+              </ul>
+            </div>
+            
+            {/* Newsletter */}
+            <div className="col-span-1 lg:col-span-1">
+              <h3 className="mb-4 text-lg font-bold">Newsletter</h3>
+              <p className="mb-4 text-sm text-gray-300">
+                Subscribe to our newsletter for the latest products and exclusive offers.
+              </p>
+              <form onSubmit={handleSubscribe} className="flex flex-col space-y-2">
+                <input 
+                  type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Your email address" 
+                  className="rounded px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-primary" 
+                />
+                <button type="submit" className="rounded bg-primary px-4 py-2 font-semibold text-white hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">Subscribe</button>
+              </form>
+            </div>
+          </div>
+          <div className="mt-8 border-t border-gray-700 pt-6 text-center text-sm text-gray-300">© {new Date().getFullYear()} ShopStream. All rights reserved.</div>
         </div>
       </footer>
     </div>
@@ -143,6 +262,15 @@ function App() {
           {/* Auth routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+
+          {/* Footer pages */}
+          <Route path="/terms-of-service" element={<TermsOfService />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/careers" element={<Careers />} />
+          <Route path="/return-policy" element={<ReturnPolicy />} />
+          <Route path="/shipping-info" element={<ShippingInfo />} />
           
           {/* Protected dashboard routes */}
           <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
@@ -156,6 +284,7 @@ function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </MainLayout>
+      <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar={false} />
 
     </>
   );
