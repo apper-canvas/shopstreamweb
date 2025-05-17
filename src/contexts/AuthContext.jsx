@@ -56,6 +56,7 @@ export function AuthProvider({ children }) {
       setCurrentUser(null);
     }
     setLoading(false);
+  }, [userState]);
 
   const login = async (email, password, remember = false) => {
     try {
