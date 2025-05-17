@@ -104,20 +104,20 @@ export default function ProductList() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="mb-8 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-surface-800 dark:text-white">Product Management</h1>
-        <Link to="/admin/products/new" className="flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark">
-          <Plus className="mr-2 h-4 w-4" />
+        <Link to="/admin/products/new" className="flex items-center rounded-lg bg-primary px-6 py-3 text-base font-medium text-white hover:bg-primary-dark shadow-md transition-all">
+          <Plus className="mr-2 h-5 w-5" />
           Add New Product
         </Link>
       </div>
 
       {/* Search and filters */}
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="relative flex-1">
           <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-            <Search className="h-4 w-4 text-surface-400" />
-          </div>
+            <Search className="h-5 w-5 text-surface-400" />
+          </div> 
           <input
             type="text"
             className="w-full rounded-lg border border-surface-200 bg-white py-2 pl-10 pr-4 text-surface-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-surface-700 dark:bg-surface-800 dark:text-white"
@@ -129,7 +129,7 @@ export default function ProductList() {
         <div className="flex items-center gap-2">
           <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-              <Filter className="h-4 w-4 text-surface-400" />
+              <Filter className="h-5 w-5 text-surface-400" />
             </div>
             <select
               className="rounded-lg border border-surface-200 bg-white py-2 pl-10 pr-8 text-surface-800 focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-surface-700 dark:bg-surface-800 dark:text-white"
@@ -182,8 +182,8 @@ export default function ProductList() {
                   )}
                 </button>
               </th>
-              <th scope="col" className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-surface-500 dark:text-surface-400">
-                Actions
+              <th scope="col" className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-surface-500 dark:text-surface-400 w-48">
+                ACTIONS
               </th>
             </tr>
           </thead>
@@ -223,27 +223,27 @@ export default function ProductList() {
                   </span>
                 </td>
                 <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                  <div className="flex justify-end space-x-2">
+                  <div className="flex justify-end space-x-3">
                     <Link 
                       to={`/product/${product.id}`} 
-                      className="rounded p-1 text-surface-500 hover:bg-surface-100 hover:text-surface-700 dark:text-surface-400 dark:hover:bg-surface-700 dark:hover:text-white"
+                      className="rounded p-2 text-surface-500 hover:bg-surface-100 hover:text-surface-700 dark:text-surface-400 dark:hover:bg-surface-700 dark:hover:text-white"
                       title="View Product"
                     >
                       <Eye className="h-5 w-5" />
                     </Link>
                     <Link 
                       to={`/admin/products/edit/${product.id}`} 
-                      className="rounded p-1 text-blue-500 hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-blue-900/30"
+                      className="flex items-center rounded px-3 py-1.5 text-blue-500 hover:bg-blue-100 hover:text-blue-700 dark:hover:bg-blue-900/30 border border-blue-200 dark:border-blue-800"
                       title="Edit Product"
                     >
-                      <Edit className="h-5 w-5" />
+                      <Edit className="h-4 w-4 mr-1" /> <span>Edit</span>
                     </Link>
                     <button 
                       onClick={() => confirmDelete(product)} 
-                      className="rounded p-1 text-red-500 hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-900/30"
+                      className="flex items-center rounded px-3 py-1.5 text-red-500 hover:bg-red-100 hover:text-red-700 dark:hover:bg-red-900/30 border border-red-200 dark:border-red-800"
                       title="Delete Product"
                     >
-                      <Trash className="h-5 w-5" />
+                      <Trash className="h-4 w-4 mr-1" /> <span>Delete</span>
                     </button>
                   </div>
                 </td>
