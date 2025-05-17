@@ -55,7 +55,6 @@ const InstagramIcon = getIcon('Instagram');
 const ProtectedRoute = ({ children, redirectTo = "/login" }) => {
   const { user, isAuthenticated } = useSelector((state) => state.user);
   const location = useLocation();
-  const location = useLocation();
   
   if (user === undefined) {
     return <div className="flex h-screen items-center justify-center">Loading...</div>;
