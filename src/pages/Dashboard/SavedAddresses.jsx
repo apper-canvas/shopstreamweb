@@ -59,7 +59,6 @@ export default function SavedAddresses() {
       country: 'United States',
       isDefault: false
     });
-    });
     setShowAddressForm(true);
     setErrors({});
   };
