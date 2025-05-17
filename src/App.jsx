@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useNavigate, Link } from 'react-router-dom';
 import { getIcon } from './utils/iconUtils';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
@@ -82,21 +82,21 @@ const MainLayout = ({ children }) => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
-              <a href="/" className="text-xl font-bold text-primary">ShopStream</a>
+              <Link to="/" className="text-xl font-bold text-primary">ShopStream</Link>
               <nav className="hidden md:block">
                 <ul className="flex space-x-6">
-                  <li><a href="/" className="hover:text-primary">Home</a></li>
-                  <li><a href="/shop" className="hover:text-primary">Shop</a></li>
-                  <li><a href="/categories" className="hover:text-primary">Categories</a></li>
-                  <li><a href="/deals" className="hover:text-primary">Deals</a></li>
-                  <li><a href="/about" className="hover:text-primary">About</a></li>
-                  <li><a href="/track-order" className="hover:text-primary">Track Order</a></li>
+                  <li><Link to="/" className="hover:text-primary">Home</Link></li>
+                  <li><Link to="/shop" className="hover:text-primary">Shop</Link></li>
+                  <li><Link to="/categories" className="hover:text-primary">Categories</Link></li>
+                  <li><Link to="/deals" className="hover:text-primary">Deals</Link></li>
+                  <li><Link to="/about" className="hover:text-primary">About</Link></li>
+                  <li><Link to="/track-order" className="hover:text-primary">Track Order</Link></li>
                 </ul>
               </nav>
             </div>
             <div className="flex items-center space-x-4">
-              <a href="/cart" className="hover:text-primary">Cart</a>
-              <a href="/login" className="hover:text-primary">Login</a>
+              <Link to="/cart" className="hover:text-primary">Cart</Link>
+              <Link to="/login" className="hover:text-primary">Login</Link>
             </div>
           </div>
         </div>
@@ -151,10 +151,10 @@ const MainLayout = ({ children }) => {
             <div className="col-span-1">
               <h3 className="mb-4 text-lg font-bold">Shop</h3>
               <ul className="space-y-2 text-sm">
-                <li><a href="/shop" className="text-gray-300 hover:text-white">All Products</a></li>
-                <li><a href="/categories" className="text-gray-300 hover:text-white">Categories</a></li>
-                <li><a href="/deals" className="text-gray-300 hover:text-white">Deals & Offers</a></li>
-                <li><a href="/track-order" className="text-gray-300 hover:text-white">Order Tracking</a></li>
+                <li><Link to="/shop" className="text-gray-300 hover:text-white">All Products</Link></li>
+                <li><Link to="/categories" className="text-gray-300 hover:text-white">Categories</Link></li>
+                <li><Link to="/deals" className="text-gray-300 hover:text-white">Deals & Offers</Link></li>
+                <li><Link to="/track-order" className="text-gray-300 hover:text-white">Order Tracking</Link></li>
               </ul>
             </div>
             
@@ -162,10 +162,10 @@ const MainLayout = ({ children }) => {
             <div className="col-span-1">
               <h3 className="mb-4 text-lg font-bold">Support</h3>
               <ul className="space-y-2 text-sm">
-                <li><a href="/contact" className="text-gray-300 hover:text-white">Contact Us</a></li>
-                <li><a href="/faq" className="text-gray-300 hover:text-white">FAQ</a></li>
-                <li><a href="/shipping-info" className="text-gray-300 hover:text-white">Shipping Information</a></li>
-                <li><a href="/return-policy" className="text-gray-300 hover:text-white">Returns & Refunds</a></li>
+                <li><Link to="/contact" className="text-gray-300 hover:text-white">Contact Us</Link></li>
+                <li><Link to="/faq" className="text-gray-300 hover:text-white">FAQ</Link></li>
+                <li><Link to="/shipping-info" className="text-gray-300 hover:text-white">Shipping Information</Link></li>
+                <li><Link to="/return-policy" className="text-gray-300 hover:text-white">Returns & Refunds</Link></li>
               </ul>
             </div>
             
@@ -173,10 +173,10 @@ const MainLayout = ({ children }) => {
             <div className="col-span-1">
               <h3 className="mb-4 text-lg font-bold">Company</h3>
               <ul className="space-y-2 text-sm">
-                <li><a href="/about" className="text-gray-300 hover:text-white">About Us</a></li>
-                <li><a href="/careers" className="text-gray-300 hover:text-white">Careers</a></li>
-                <li><a href="/terms-of-service" className="text-gray-300 hover:text-white">Terms of Service</a></li>
-                <li><a href="/privacy-policy" className="text-gray-300 hover:text-white">Privacy Policy</a></li>
+                <li><Link to="/about" className="text-gray-300 hover:text-white">About Us</Link></li>
+                <li><Link to="/careers" className="text-gray-300 hover:text-white">Careers</Link></li>
+                <li><Link to="/terms-of-service" className="text-gray-300 hover:text-white">Terms of Service</Link></li>
+                <li><Link to="/privacy-policy" className="text-gray-300 hover:text-white">Privacy Policy</Link></li>
               </ul>
             </div>
             
