@@ -35,7 +35,6 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import AdminLayout from './pages/Admin/AdminLayout';
 import AdminDashboard from './pages/Admin/AdminDashboard';
 import ProductList from './pages/Admin/Products/ProductList';
-import ProductForm from './pages/Admin/Products/ProductForm';
 // Import toast for notifications
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -309,8 +308,8 @@ function App() {
           <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
             <Route index element={<AdminDashboard />} />
             <Route path="products" element={<ProductList />} />
-            <Route path="products/new" element={<ProductForm />} />
-            <Route path="products/edit/:id" element={<ProductForm />} />
+            <Route path="products/new" element={<ProductList />} />
+            <Route path="products/edit/:id" element={<ProductList />} />
           </Route>
 
           {/* 404 route */}
