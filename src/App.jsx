@@ -239,6 +239,8 @@ function App() {
     return savedMode ? JSON.parse(savedMode) : window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
   const [isInitialized, setIsInitialized] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector((state) => state.user);
 
   // Apply dark mode class to html element
