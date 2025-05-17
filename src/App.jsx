@@ -301,7 +301,7 @@ function App() {
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<ProductList />} />
           <Route path="products/new" element={<AddEditProduct />} />
-          <Route path="products/edit/:id" element={<ProductList />} />
+          <Route path="products/edit/:id" element={<AddEditProduct />} />
         </Route>
 
         {/* 404 route */}
