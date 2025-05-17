@@ -8,6 +8,7 @@ const CheckCircleIcon = getIcon('CheckCircle');
 const ArrowRightIcon = getIcon('ArrowRight');
 const HomeIcon = getIcon('Home');
 const ShoppingBagIcon = getIcon('ShoppingBag');
+const TruckIcon = getIcon('Truck');
 
 export default function OrderConfirmation() {
   const { clearCart } = useCart();
