@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
-import { fetchOrderById } from '../services/orderService';
 import { motion } from 'framer-motion';
 import { getIcon } from '../utils/iconUtils';
 import { useCart } from '../contexts/CartContext';
+import { fetchOrderById } from '../services/orderService';
 
 const CheckCircleIcon = getIcon('CheckCircle');
 const ArrowRightIcon = getIcon('ArrowRight');
@@ -81,10 +81,30 @@ export default function OrderConfirmation() {
   }
   
   // Format date
-  const orderDate = new Date(order.date).toLocaleDateString('en-US', {
+  // Add null check to avoid TypeInfo errors when formatting date
+  const orderDate = order.date ? new Date(order.date).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
+  }) : 'Processing';
+  
+  // Safely parse JSON to avoid TypeInfo errors
+  const safeParseJSON = (jsonString, defaultValue = {}) => {
+    try {
+      return typeof jsonString === 'string' ? JSON.parse(jsonString) : jsonString || defaultValue;
+    } catch (error) {
+      console.error('Error parsing JSON:', error);
+      return defaultValue;
+    }
+  };
+  
+  // Ensure shipping info exists and has expected structure
+  const shippingInfo = safeParseJSON(order.shippingInfo, {
+    fullName: 'N/A',
+    address: 'N/A',
+    city: 'N/A',
+    state: 'N/A',
+    zipCode: 'N/A'
   });
 
   return (
@@ -135,17 +155,17 @@ export default function OrderConfirmation() {
             
             <div className="mb-4">
               <p className="text-sm font-medium text-surface-500 dark:text-surface-400">Shipping Address</p>
-              <p className="text-surface-800 dark:text-white">{order.shippingInfo.fullName}</p>
-              <p className="text-surface-800 dark:text-white">{order.shippingInfo.address}</p>
+              <p className="text-surface-800 dark:text-white">{shippingInfo.fullName}</p>
+              <p className="text-surface-800 dark:text-white">{shippingInfo.address}</p>
               <p className="text-surface-800 dark:text-white">
-                {order.shippingInfo.city}, {order.shippingInfo.state} {order.shippingInfo.zipCode}
+                {shippingInfo.city}, {shippingInfo.state} {shippingInfo.zipCode}
               </p>
             </div>
             
             <div className="border-t border-surface-200 pt-4 dark:border-surface-600">
               <p className="flex items-center justify-between text-lg font-bold">
                 <span className="text-surface-800 dark:text-white">Total</span>
-                <span className="text-primary">${order.total.toFixed(2)}</span>
+                <span className="text-primary">${(order.total || 0).toFixed(2)}</span>
               </p>
             </div>
           </div>
