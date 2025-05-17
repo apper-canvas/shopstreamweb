@@ -81,14 +81,24 @@ export default function OrderConfirmation() {
   }
   
   // Format date
-  // Add null check to avoid TypeInfo errors when formatting date
-  const orderDate = order.date ? new Date(order.date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }) : 'Processing';
+  // Add null check to avoid errors when formatting date
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Processing';
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Processing';
+    }
+  };
   
-  // Safely parse JSON to avoid TypeInfo errors
+  const orderDate = formatDate(order.date);
+  
+  // Safely parse JSON to avoid errors
   const safeParseJSON = (jsonString, defaultValue = {}) => {
     try {
       return typeof jsonString === 'string' ? JSON.parse(jsonString) : jsonString || defaultValue;
