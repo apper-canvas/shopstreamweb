@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { fetchOrderById } from '../services/orderService';
 import { motion } from 'framer-motion';
 import { getIcon } from '../utils/iconUtils';
 import { useCart } from '../contexts/CartContext';
@@ -17,23 +18,47 @@ export default function OrderConfirmation() {
   
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const cartCleared = useRef(false);
   
   useEffect(() => {
-    // Attempt to retrieve order details from localStorage
-    const storedOrder = localStorage.getItem(`order_${orderId}`);
+    // Define an async function to fetch order data
+    const getOrderData = async () => {
+      try {
+        // First try to get order from API
+        const fetchedOrder = await fetchOrderById(orderId);
+        
+        if (fetchedOrder) {
+          setOrder(fetchedOrder);
+          // Only clear the cart once when we successfully find an order
+          if (!cartCleared.current) {
+            clearCart();
+            cartCleared.current = true;
+          }
+        } else {
+          // Fall back to localStorage if API fails
+          const storedOrder = localStorage.getItem(`order_${orderId}`);
+          if (storedOrder) {
+            setOrder(JSON.parse(storedOrder));
+            // Only clear the cart once when we successfully find an order
+            if (!cartCleared.current) {
+              clearCart();
+              cartCleared.current = true;
+            }
+          } else {
+            // If no order found, redirect to home
+            navigate('/');
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching order:", error);
+        navigate('/');
+      } finally {
+        setLoading(false);
+      }
+    };
     
-    if (storedOrder) {
-      setOrder(JSON.parse(storedOrder));
-    } else {
-      // If no order found, redirect to home
-      navigate('/');
-    }
-    
-    setLoading(false);
-    
-    // Clear the cart since order is complete
-    clearCart();
-  }, [orderId, navigate, clearCart]);
+    getOrderData();
+  }, [orderId, navigate]); // Removed clearCart from dependencies
   
   if (loading) {
     return (
