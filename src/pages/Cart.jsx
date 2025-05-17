@@ -94,8 +94,8 @@ export default function Cart() {
                 
                 {/* Cart items */}
                 <div className="divide-y divide-surface-200 dark:divide-surface-700">
-                  {cartItems.map((item) => (
-                    <div key={`${item.id}-${item.size || 'default'}`} className="flex p-4">
+                  {cartItems.map((item, index) => (
+                    <div key={`${item.id}-${item.size || 'default'}-${index}`} className="flex p-4">
                       {/* Product image */}
                       <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md">
                         <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
