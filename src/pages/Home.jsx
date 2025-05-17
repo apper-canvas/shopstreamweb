@@ -218,7 +218,6 @@ export default function Home() {
               <Link 
                       to={navigationPaths[item] || '#'}
                 to={`/product/${product.id}`}
-                className="group overflow-hidden rounded-xl bg-white p-4 shadow-sm transition-all hover:shadow-md dark:bg-surface-800 dark:hover:bg-surface-700/80"
                     >
                       {item}
                     </Link>
@@ -262,7 +261,7 @@ export default function Home() {
                 >
                   <Link to="/shop" className="btn-primary">Shop Now</Link>
                   <Link to="/deals" className="btn border-2 border-white bg-transparent text-white hover:bg-white hover:text-primary">View Deals</Link>
-              </Link>
+                </motion.div>
               </div>
               <motion.div 
                 className="relative md:w-1/2"
