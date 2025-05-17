@@ -1,9 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import { getIcon } from './utils/iconUtils';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
+import DashboardLayout from './pages/Dashboard/DashboardLayout';
+import DashboardHome from './pages/Dashboard/DashboardHome';
+import AccountSettings from './pages/Dashboard/AccountSettings';
+import SavedAddresses from './pages/Dashboard/SavedAddresses';
+import SavedPayments from './pages/Dashboard/SavedPayments';
+import OrderHistory from './pages/Dashboard/OrderHistory';
+import UserDropdown from './components/UserDropdown';
 
 // Get icon components
 const MoonIcon = getIcon('Moon');
@@ -43,7 +50,15 @@ function App() {
       {/* Application routes */}
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route index element={<DashboardHome />} />
+          <Route path="account" element={<AccountSettings />} />
+          <Route path="addresses" element={<SavedAddresses />} />
+          <Route path="payments" element={<SavedPayments />} />
+          <Route path="orders" element={<OrderHistory />} />
+        </Route>
         <Route path="*" element={<NotFound />} />
+        <Route path="/login" element={<Navigate to="/dashboard" />} />
       </Routes>
 
       {/* Toast notification container */}

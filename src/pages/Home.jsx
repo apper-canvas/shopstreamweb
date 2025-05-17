@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { getIcon } from '../utils/iconUtils';
@@ -13,9 +13,11 @@ const HeartIcon = getIcon('Heart');
 const UserIcon = getIcon('User');
 
 export default function Home() {
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  
+  const userMenuRef = useRef(null);
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(prev => !prev);
   };
@@ -23,6 +25,22 @@ export default function Home() {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
+  
+  const toggleUserMenu = () => {
+    setShowUserMenu(prev => !prev);
+  };
+
+  // Close the user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setShowUserMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
       toast.info(`Searching for "${searchQuery}"`);
     }
   };
@@ -90,9 +108,19 @@ export default function Home() {
               <ShoppingCartIcon className="h-5 w-5" />
               <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs text-white">0</span>
             </button>
-            
-            <button className="rounded-full p-2 text-surface-600 hover:bg-surface-100 hover:text-primary dark:text-surface-300 dark:hover:bg-surface-700 dark:hover:text-primary-light">
+
+            {/* User profile dropdown */}
+            <button 
+              className="relative rounded-full p-2 text-surface-600 hover:bg-surface-100 hover:text-primary dark:text-surface-300 dark:hover:bg-surface-700 dark:hover:text-primary-light"
+              onClick={toggleUserMenu}
+              ref={userMenuRef}
+            >
               <UserIcon className="h-5 w-5" />
+              
+              {/* User dropdown menu */}
+              {showUserMenu && (
+                <UserDropdown />
+              )}
             </button>
             
             {/* Mobile menu button */}
