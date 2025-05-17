@@ -146,7 +146,7 @@ export default function Checkout() {
   // Handle next step
   const handleNextStep = () => {
     if (currentStep === 'shipping') {
-      if (validateShippingForm()) {
+                        key={`address-${idx}-${address.isDefault ? 'default' : 'nondefault'}`}
         setCurrentStep('payment');
       } else {
         toast.error('Please fill in all required fields correctly');
@@ -196,7 +196,7 @@ export default function Checkout() {
     
     setIsProcessing(true);
     
-    try {
+                        key={`payment-${idx}-${method.isDefault ? 'default' : 'nondefault'}`}
       // Process the order
       const { success, orderId, error } = placeOrder(shippingInfo, paymentInfo);
       
