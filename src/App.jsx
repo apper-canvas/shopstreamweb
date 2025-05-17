@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { ToastContainer, toast } from 'react-toastify';
+import { Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
 import { getIcon } from './utils/iconUtils';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
@@ -10,11 +10,29 @@ import AccountSettings from './pages/Dashboard/AccountSettings';
 import SavedAddresses from './pages/Dashboard/SavedAddresses';
 import SavedPayments from './pages/Dashboard/SavedPayments';
 import OrderHistory from './pages/Dashboard/OrderHistory';
-import UserDropdown from './components/UserDropdown';
+import Login from './pages/Auth/Login';
+import Register from './pages/Auth/Register';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 // Get icon components
 const MoonIcon = getIcon('Moon');
 const SunIcon = getIcon('Sun');
+
+// Protected route component to handle authentication
+const ProtectedRoute = ({ children }) => {
+  const { currentUser, loading } = useAuth();
+  const location = useLocation();
+  
+  if (loading) {
+    return <div className="flex h-screen items-center justify-center">Loading...</div>;
+  }
+  
+  if (!currentUser) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+  
+  return children;
+};
 
 function App() {
   const [darkMode, setDarkMode] = useState(() => {
@@ -50,7 +68,13 @@ function App() {
       {/* Application routes */}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<DashboardLayout />}>
+        
+        {/* Auth routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        
+        {/* Protected dashboard routes */}
+        <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
           <Route index element={<DashboardHome />} />
           <Route path="account" element={<AccountSettings />} />
           <Route path="addresses" element={<SavedAddresses />} />
@@ -58,7 +82,6 @@ function App() {
           <Route path="orders" element={<OrderHistory />} />
         </Route>
         <Route path="*" element={<NotFound />} />
-        <Route path="/login" element={<Navigate to="/dashboard" />} />
       </Routes>
 
       {/* Toast notification container */}
@@ -78,4 +101,13 @@ function App() {
   );
 }
 
-export default App;
+// Wrap the App component with AuthProvider
+function AppWithAuth() {
+  return (
+    <AuthProvider>
+      <App />
+    </AuthProvider>
+  );
+}
+
+export default AppWithAuth;
