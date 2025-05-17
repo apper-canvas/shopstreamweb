@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { getIcon } from '../utils/iconUtils';
 import { useCart } from '../contexts/CartContext';
-import { useAuth } from '../contexts/AuthContext';
 
 const ArrowLeftIcon = getIcon('ArrowLeft');
 const ArrowRightIcon = getIcon('ArrowRight');
@@ -29,17 +29,18 @@ export default function Checkout() {
     placeOrder
   } = useCart();
   
-  const { currentUser } = useAuth();
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useSelector((state) => state.user);
   
   // State
   const [currentStep, setCurrentStep] = useState('shipping');
   const [isProcessing, setIsProcessing] = useState(false);
   
+  // Get user email from Redux state if available
   // Form state
   const [shippingInfo, setShippingInfo] = useState({
     fullName: '',
-    email: currentUser?.email || '',
+    email: user?.emailAddress || '',
     address: '',
     city: '',
     state: '',
@@ -60,9 +61,11 @@ export default function Checkout() {
   const [paymentErrors, setPaymentErrors] = useState({});
   
   // If cart is empty redirect to cart page
+  // Also redirect if not authenticated
   useEffect(() => {
-    if (cartItems.length === 0) {
-      toast.info("Your cart is empty. Please add items before checkout.");
+    if (!isAuthenticated) {
+      toast.error("Please log in to continue with checkout.");
+      navigate('/login?redirect=/checkout');
       navigate('/cart');
     }
   }, [cartItems, navigate]);

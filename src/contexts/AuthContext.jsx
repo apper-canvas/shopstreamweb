@@ -1,4 +1,5 @@
 import { createContext, useState, useContext, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
 const AuthContext = createContext(null);
 
@@ -45,24 +46,16 @@ const DUMMY_USER = {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const userState = useSelector((state) => state.user);
 
   useEffect(() => {
-    // Check if user is stored in localStorage on initial load
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setCurrentUser(JSON.parse(storedUser));
+    // Use user data from Redux store
+    if (userState.isAuthenticated && userState.user) {
+      setCurrentUser(userState.user);
+    } else {
+      setCurrentUser(null);
     }
     setLoading(false);
-  }, []);
-
-  // Update localStorage when user changes
-  useEffect(() => {
-    if (currentUser) {
-      localStorage.setItem('user', JSON.stringify(currentUser));
-    } else {
-      localStorage.removeItem('user');
-    }
-  }, [currentUser]);
 
   const login = async (email, password, remember = false) => {
     try {
@@ -342,5 +335,18 @@ export function AuthProvider({ children }) {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  // Get context data
+  const context = useContext(AuthContext);
+  
+  // Fall back to Redux store if context is null
+  if (!context) {
+    const user = useSelector((state) => state.user);
+    return {
+      currentUser: user.isAuthenticated ? user.user : null,
+      loading: false
+    };
+  }
+  return context;
+};
 export default AuthContext;
