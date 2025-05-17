@@ -55,6 +55,7 @@ const InstagramIcon = getIcon('Instagram');
 const ProtectedRoute = ({ children, redirectTo = "/login" }) => {
   const { user, isAuthenticated } = useSelector((state) => state.user);
   const location = useLocation();
+  const location = useLocation();
   
   if (user === undefined) {
     return <div className="flex h-screen items-center justify-center">Loading...</div>;
@@ -71,6 +72,7 @@ const ProtectedRoute = ({ children, redirectTo = "/login" }) => {
 const AdminRoute = ({ children }) => {
   const { user, isAuthenticated } = useSelector((state) => state.user);
   const location = useLocation();
+  const redirectPath = isAuthenticated ? '/dashboard' : '/login';
   
   if (user === undefined) {
     return <div className="flex h-screen items-center justify-center">Loading...</div>;
@@ -79,23 +81,34 @@ const AdminRoute = ({ children }) => {
   // Check if user is logged in and has admin role
   if (!isAuthenticated || !user.isAdmin) {
     // Redirect to dashboard if user is logged in but not admin, or login if not logged in
-    const redirectPath = currentUser ? '/dashboard' : '/login';
     return <Navigate to={redirectPath} state={{ from: location }} replace />;
   }
   
   return children;
 };
 
-// Main layout component with sticky header and footer
-    const redirectPath = isAuthenticated ? '/dashboard' : '/login';
-  const [email, setEmail] = useState('');
+function App() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { user, isAuthenticated } = useSelector((state) => state.user);
+  const [email, setEmail] = useState('');
   const handleSubscribe = (e) => {
     e.preventDefault();
     
     // Email validation
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+      return;
+    }
 const MainLayout = ({ children }) => {
+  const { user, isAuthenticated } = useSelector((state) => state.user);
+  const [email, setEmail] = useState('');
+  
+  const handleSubscribe = (e) => {
+    e.preventDefault();
+    
+    // Email validation
+    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
       return;
     }
     
@@ -235,9 +248,6 @@ const MainLayout = ({ children }) => {
 };
 
 function App() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
   const [darkMode, setDarkMode] = useState(() => {
     const savedMode = localStorage.getItem('darkMode');
     return savedMode ? JSON.parse(savedMode) : window.matchMedia('(prefers-color-scheme: dark)').matches;
