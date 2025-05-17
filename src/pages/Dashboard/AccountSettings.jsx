@@ -319,7 +319,7 @@ export default function AccountSettings() {
             </div>
           </form>
       </div>
+      </div>
     </div>
-  );
   );
 }
