@@ -249,7 +249,6 @@ function App() {
 
   return (
     <>
-      {/* Theme toggle button */}
       <button
         onClick={toggleDarkMode}
         className="fixed right-4 top-4 z-50 rounded-full bg-surface-200 p-2 text-surface-800 shadow-md transition-all hover:bg-surface-300 dark:bg-surface-700 dark:text-surface-100 dark:hover:bg-surface-600"
@@ -258,8 +257,6 @@ function App() {
         {darkMode ? <SunIcon size={20} /> : <MoonIcon size={20} />}
       </button>
 
-      {/* Application routes */}
-      <MainLayout>
         <Routes>
           <Route path="/" element={<Home />} />
           {/* Shop, Categories, Deals, and About routes */}
@@ -315,7 +312,6 @@ function App() {
           {/* 404 route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </MainLayout>
       <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar={false} />
 
     </>
