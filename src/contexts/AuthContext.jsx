@@ -24,9 +24,20 @@ const DUMMY_USER = {
   paymentMethods: [
     {
       id: "pay-1",
-      type: "Credit Card",
-      cardNumber: "**** **** **** 4242",
-      expiryDate: "12/25",
+      name: "Personal Card",
+      type: "Visa",
+      last4: "4242",
+      expiryMonth: "12",
+      expiryYear: "2025",
+      isDefault: true
+    },
+    {
+      id: "pay-2",
+      name: "Business Card",
+      type: "Mastercard",
+      last4: "8888",
+      expiryMonth: "06",
+      expiryYear: "2024",
       isDefault: true
     }
   ]
@@ -109,7 +120,138 @@ export function AuthProvider({ children }) {
     toast.info('You have been logged out');
   };
 
-  const value = { currentUser, loading, login, register, logout, setCurrentUser };
+  // Payment Methods Management
+  const addPaymentMethod = (newMethod) => {
+    try {
+      // Make sure user is logged in
+      if (!currentUser) {
+        throw new Error('You must be logged in to add a payment method');
+      }
+      
+      // Make sure payment method has all required fields
+      if (!newMethod.name || !newMethod.type || !newMethod.last4 || 
+          !newMethod.expiryMonth || !newMethod.expiryYear) {
+        throw new Error('Invalid payment method data');
+      }
+      
+      // Create a copy of the user's payment methods or initialize if none exist
+      const updatedPaymentMethods = [...(currentUser.paymentMethods || [])];
+      
+      // If this is set as default, update all others
+      if (newMethod.isDefault) {
+        updatedPaymentMethods.forEach(method => method.isDefault = false);
+      }
+      
+      // Add the new method
+      updatedPaymentMethods.push(newMethod);
+      
+      // Update user object
+      setCurrentUser({
+        ...currentUser,
+        paymentMethods: updatedPaymentMethods
+      });
+      
+      return true;
+    } catch (error) {
+      toast.error(error.message || 'Failed to add payment method');
+      return false;
+    }
+  };
+  
+  const updatePaymentMethod = (updatedMethod) => {
+    try {
+      if (!currentUser) {
+        throw new Error('You must be logged in to update a payment method');
+      }
+      
+      const updatedPaymentMethods = currentUser.paymentMethods.map(method => {
+        if (method.id === updatedMethod.id) {
+          // Keep existing fields that weren't updated
+          return { ...method, ...updatedMethod };
+        }
+        
+        // If updated method is set as default, make other methods not default
+        if (updatedMethod.isDefault) {
+          return { ...method, isDefault: false };
+        }
+        
+        return method;
+      });
+      
+      setCurrentUser({
+        ...currentUser,
+        paymentMethods: updatedPaymentMethods
+      });
+      
+      return true;
+    } catch (error) {
+      toast.error(error.message || 'Failed to update payment method');
+      return false;
+    }
+  };
+  
+  const deletePaymentMethod = (id) => {
+    try {
+      if (!currentUser) {
+        throw new Error('You must be logged in to delete a payment method');
+      }
+      
+      // Check if trying to delete default method when it's the only one
+      const isDefault = currentUser.paymentMethods.find(m => m.id === id)?.isDefault;
+      const remainingMethods = currentUser.paymentMethods.filter(m => m.id !== id);
+      
+      if (isDefault && remainingMethods.length > 0) {
+        // If deleting default, make the first remaining method the default
+        remainingMethods[0].isDefault = true;
+      }
+      
+      setCurrentUser({
+        ...currentUser,
+        paymentMethods: remainingMethods
+      });
+      
+      return true;
+    } catch (error) {
+      toast.error(error.message || 'Failed to delete payment method');
+      return false;
+    }
+  };
+  
+  const setDefaultPaymentMethod = (id) => {
+    try {
+      if (!currentUser) {
+        throw new Error('You must be logged in to update a payment method');
+      }
+      
+      const updatedPaymentMethods = currentUser.paymentMethods.map(method => ({
+        ...method,
+        isDefault: method.id === id
+      }));
+      
+      setCurrentUser({
+        ...currentUser,
+        paymentMethods: updatedPaymentMethods
+      });
+      
+      return true;
+    } catch (error) {
+      toast.error(error.message || 'Failed to set default payment method');
+      return false;
+    }
+  };
+
+  const value = { 
+    currentUser, 
+    loading, 
+    login, 
+    register, 
+    logout, 
+    setCurrentUser,
+    addPaymentMethod,
+    updatePaymentMethod,
+    deletePaymentMethod,
+    setDefaultPaymentMethod
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
