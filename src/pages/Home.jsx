@@ -215,10 +215,10 @@ export default function Home() {
               <ul className="flex flex-col space-y-2">
                 {['Home', 'Shop', 'Categories', 'Deals', 'About'].map((item) => (
                   <li key={item}>
-                    <Link 
+              <Link 
                       to={navigationPaths[item] || '#'}
-                      className="block rounded-lg p-2 text-surface-600 hover:bg-surface-100 hover:text-primary dark:text-surface-300 dark:hover:bg-surface-700 dark:hover:text-primary-light"
-                      onClick={() => handleNavigation(navigationPaths[item] || '#')}
+                to={`/product/${product.id}`}
+                className="group overflow-hidden rounded-xl bg-white p-4 shadow-sm transition-all hover:shadow-md dark:bg-surface-800 dark:hover:bg-surface-700/80"
                     >
                       {item}
                     </Link>
@@ -262,7 +262,7 @@ export default function Home() {
                 >
                   <Link to="/shop" className="btn-primary">Shop Now</Link>
                   <Link to="/deals" className="btn border-2 border-white bg-transparent text-white hover:bg-white hover:text-primary">View Deals</Link>
-                </motion.div>
+              </Link>
               </div>
               <motion.div 
                 className="relative md:w-1/2"

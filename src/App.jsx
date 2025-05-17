@@ -8,6 +8,7 @@ import Shop from './pages/Shop';
 import Categories from './pages/Categories';
 import Deals from './pages/Deals';
 import About from './pages/About';
+import ProductDetail from './pages/ProductDetail';
 import DashboardLayout from './pages/Dashboard/DashboardLayout';
 import DashboardHome from './pages/Dashboard/DashboardHome';
 import AccountSettings from './pages/Dashboard/AccountSettings';
@@ -77,6 +78,9 @@ function App() {
         <Route path="/categories" element={<Categories />} />
         <Route path="/deals" element={<Deals />} />
         <Route path="/about" element={<About />} />
+        
+        {/* Product detail route */}
+        <Route path="/product/:id" element={<ProductDetail />} />
         
         {/* Auth routes */}
         <Route path="/login" element={<Login />} />
