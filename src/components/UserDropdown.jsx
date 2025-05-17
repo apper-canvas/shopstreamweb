@@ -41,7 +41,7 @@ export default function UserDropdown() {
         </p>
       </li>
       
-      <li className="py-1">
+      <div className="py-1">
         {/* Menu items */}
         {menuItems.map((item, index) => (
           <li key={index} role="menuitem">
@@ -67,7 +67,7 @@ export default function UserDropdown() {
             <LogOut className="mr-3 h-4 w-4" /> {currentUser ? "Sign Out" : "Sign In"}
           </a>
         </li>
-      </li>
+      </div>
     </ul>
   );
 }
