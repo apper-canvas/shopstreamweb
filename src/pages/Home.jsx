@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
+import { useCart } from '../contexts/CartContext';
 import { toast } from 'react-toastify';
 import { getIcon } from '../utils/iconUtils';
 import MainFeature from '../components/MainFeature';
 
+import CartPreview from '../components/CartPreview';
 // Get icon components
 const ShoppingCartIcon = getIcon('ShoppingCart');
 const SearchIcon = getIcon('Search');
@@ -26,6 +28,7 @@ export default function Home() {
   const { currentUser } = useAuth();
 
   const toggleMobileMenu = () => {
+  const { getCartItemCount } = useCart();
     setMobileMenuOpen(prev => !prev);
   };
   
@@ -59,7 +62,7 @@ export default function Home() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
+              <CartPreview />
   // Navigation handler for menu items
   const handleNavigation = (path) => {
     if (mobileMenuOpen) setMobileMenuOpen(false);

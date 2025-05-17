@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { getIcon } from '../utils/iconUtils';
 import { toast } from 'react-toastify';
+import { useCart } from '../contexts/CartContext';
 
 const ShoppingCartIcon = getIcon('ShoppingCart');
 const HeartIcon = getIcon('Heart');
@@ -22,6 +23,7 @@ const mockProducts = [
 export default function ProductDetail() {
   const { id } = useParams();
   const [product, setProduct] = useState(null);
+  const { addToCart } = useCart();
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [relatedProducts, setRelatedProducts] = useState([]);
@@ -46,7 +48,9 @@ export default function ProductDetail() {
   }, [id]);
 
   const handleAddToCart = () => {
-    toast.success(`Added ${quantity} ${product.name} to your cart!`);
+    if (addToCart(product, quantity)) {
+      // Success toast is shown by the addToCart function
+    }
   };
 
   const handleAddToWishlist = () => {

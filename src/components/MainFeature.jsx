@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { getIcon } from '../utils/iconUtils';
+import { useCart } from '../contexts/CartContext';
 
 // Get icon components
 const ShoppingCartIcon = getIcon('ShoppingCart');
@@ -152,8 +153,7 @@ const filterOptions = {
 };
 
 export default function MainFeature() {
-  // State for cart items
-  const [cart, setCart] = useState([]);
+  const { addToCart, cartItems, getCartItemCount } = useCart();
   
   // State for filter controls
   const [filters, setFilters] = useState({
@@ -197,40 +197,6 @@ export default function MainFeature() {
     }));
   };
   
-  // Add to cart functionality
-  const addToCart = (product) => {
-    // Check if product has sizes and requires selection
-    if (product.sizes && product.sizes.length > 0 && !selectedSizes[product.id]) {
-      toast.warning("Please select a size first");
-      return;
-    }
-    
-    const selectedSize = selectedSizes[product.id] || null;
-    
-    // Check if item already exists in cart
-    const existingItemIndex = cart.findIndex(item => 
-      item.id === product.id && item.size === selectedSize
-    );
-    
-    if (existingItemIndex !== -1) {
-      // Update quantity if item already in cart
-      const updatedCart = [...cart];
-      updatedCart[existingItemIndex].quantity += 1;
-      setCart(updatedCart);
-    } else {
-      // Add new item to cart
-      setCart([...cart, {
-        id: product.id,
-        name: product.name,
-        price: product.salePrice || product.price,
-        image: product.image,
-        size: selectedSize,
-        quantity: 1
-      }]);
-    }
-    
-    toast.success(`Added ${product.name} to cart`);
-  };
   
   // Apply filters and sorting to products
   useEffect(() => {
@@ -375,7 +341,7 @@ export default function MainFeature() {
           <div className="ml-auto rounded-lg bg-primary px-3 py-1 text-sm font-medium text-white md:ml-0">
             <span className="flex items-center gap-1">
               <ShoppingCartIcon className="h-4 w-4" />
-              {cart.reduce((total, item) => total + item.quantity, 0)} items
+              {getCartItemCount()} items
             </span>
           </div>
         </div>
@@ -607,7 +573,7 @@ export default function MainFeature() {
                           ? 'bg-primary text-white hover:bg-primary-dark'
                           : 'cursor-not-allowed bg-surface-300 text-surface-500 dark:bg-surface-700 dark:text-surface-400'
                       }`}
-                      onClick={() => product.inStock && addToCart(product)}
+                      onClick={() => product.inStock && addToCart(product, 1, selectedSizes[product.id])}
                       disabled={!product.inStock}
                     >
                       <ShoppingCartIcon className="h-4 w-4" />
@@ -621,64 +587,6 @@ export default function MainFeature() {
         </div>
       </div>
       
-      {/* Cart preview drawer (conditionally rendered when cart has items) */}
-      {cart.length > 0 && (
-        <motion.div
-          className="fixed bottom-0 left-0 right-0 z-40 bg-white p-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] dark:bg-surface-800 md:left-auto md:w-80"
-          initial={{ y: 100 }}
-          animate={{ y: 0 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-        >
-          <div className="flex items-center justify-between border-b border-surface-200 pb-3 dark:border-surface-700">
-            <h4 className="font-semibold text-surface-800 dark:text-white">Your Cart</h4>
-            <span className="rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-white">
-              {cart.reduce((total, item) => total + item.quantity, 0)} items
-            </span>
-          </div>
-          
-          <div className="max-h-48 overflow-y-auto py-2">
-            {cart.map((item, index) => (
-              <div key={`${item.id}-${item.size || 'default'}`} className="flex items-center gap-3 py-2">
-                <div className="h-12 w-12 flex-shrink-0 overflow-hidden rounded-md">
-                  <img 
-                    src={item.image} 
-                    alt={item.name} 
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <div className="flex-1 text-sm">
-                  <p className="font-medium text-surface-800 dark:text-white">{item.name}</p>
-                  <div className="flex justify-between">
-                    <p className="text-surface-600 dark:text-surface-400">
-                      {item.quantity} × ${item.price.toFixed(2)}
-                      {item.size && <span className="ml-1 text-xs">({item.size})</span>}
-                    </p>
-                    <p className="font-medium text-surface-800 dark:text-white">
-                      ${(item.quantity * item.price).toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-          
-          <div className="border-t border-surface-200 pt-3 dark:border-surface-700">
-            <div className="mb-3 flex justify-between">
-              <span className="font-medium text-surface-800 dark:text-white">Subtotal:</span>
-              <span className="font-semibold text-surface-800 dark:text-white">
-                ${cart.reduce((total, item) => total + (item.price * item.quantity), 0).toFixed(2)}
-              </span>
-            </div>
-            
-            <button 
-              className="w-full rounded-lg bg-primary py-2 text-center font-medium text-white hover:bg-primary-dark"
-              onClick={() => toast.success("Proceeding to checkout!")}
-            >
-              Proceed to Checkout
-            </button>
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 }

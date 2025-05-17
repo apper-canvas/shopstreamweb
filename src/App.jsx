@@ -8,6 +8,7 @@ import Shop from './pages/Shop';
 import Categories from './pages/Categories';
 import Deals from './pages/Deals';
 import About from './pages/About';
+import Cart from './pages/Cart';
 import ProductDetail from './pages/ProductDetail';
 import DashboardLayout from './pages/Dashboard/DashboardLayout';
 import DashboardHome from './pages/Dashboard/DashboardHome';
@@ -17,6 +18,7 @@ import SavedPayments from './pages/Dashboard/SavedPayments';
 import OrderHistory from './pages/Dashboard/OrderHistory';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
+import { CartProvider } from './contexts/CartContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 // Get icon components
@@ -79,6 +81,9 @@ function App() {
         <Route path="/deals" element={<Deals />} />
         <Route path="/about" element={<About />} />
         
+        {/* Cart route */}
+        <Route path="/cart" element={<Cart />} />
+        
         {/* Product detail route */}
         <Route path="/product/:id" element={<ProductDetail />} />
         
@@ -118,7 +123,9 @@ function App() {
 function AppWithAuth() {
   return (
     <AuthProvider>
-      <App />
+      <CartProvider>
+        <App />
+      </CartProvider>
     </AuthProvider>
   );
 }
