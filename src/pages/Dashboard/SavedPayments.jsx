@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { getIcon } from '../../utils/iconUtils';
+import { toast } from 'react-toastify';
+import { fetchUserPaymentMethods, createPaymentMethod, updatePaymentMethod as updatePaymentMethodService, deletePaymentMethod as deletePaymentMethodService } from '../../services/paymentMethodService';
 
 // Get icons
 const PlusCircle = getIcon('PlusCircle');
@@ -15,7 +17,7 @@ const AlertCircle = getIcon('AlertCircle');
 import { useAuth } from '../../contexts/AuthContext';
 
 export default function SavedPayments() {
-  const { currentUser, updatePaymentMethod, addPaymentMethod, deletePaymentMethod, setDefaultPaymentMethod } = useAuth();
+  const { currentUser } = useAuth();
   const [paymentMethods, setPaymentMethods] = useState([]);
   
   const [showAddForm, setShowAddForm] = useState(false);
@@ -29,13 +31,60 @@ export default function SavedPayments() {
     isDefault: false
   });
   const [formErrors, setFormErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false);
   
-  // Load payment methods from user context
+  // Load payment methods from database
   useEffect(() => {
-    if (currentUser && currentUser.paymentMethods) {
-      setPaymentMethods(currentUser.paymentMethods);
-    }
+    const loadPaymentMethods = async () => {
+      if (currentUser?.id) {
+        try {
+          setIsLoading(true);
+          const methods = await fetchUserPaymentMethods(currentUser.id);
+          setPaymentMethods(methods);
+        } catch (error) {
+          console.error('Failed to load payment methods:', error);
+          toast.error('Failed to load payment methods. Please try again later.');
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+    
+    loadPaymentMethods();
   }, [currentUser]);
+  
+  // Set default payment method
+  const setDefaultPaymentMethod = async (id) => {
+    try {
+      setIsLoading(true);
+      
+      // Update all payment methods in the database to set the selected one as default
+      for (const method of paymentMethods) {
+        const isDefault = method.id === id;
+        await updatePaymentMethodService(method.id, {
+          ...method,
+          isDefault
+        });
+      }
+      
+      // Update local state
+      setPaymentMethods(prev => 
+        prev.map(method => ({
+          ...method,
+          isDefault: method.id === id
+        }))
+      );
+      
+      toast.success('Default payment method updated successfully');
+      return true;
+    } catch (error) {
+      console.error('Failed to set default payment method:', error);
+      toast.error('Failed to update default payment method. Please try again.');
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   const resetForm = () => {
     setFormData({
@@ -184,10 +233,28 @@ export default function SavedPayments() {
   
   const handleDelete = (id) => {
     if (confirm('Are you sure you want to delete this payment method?')) {
-      const success = deletePaymentMethod(id);
-      if (success) {
-        setPaymentMethods(prev => prev.filter(method => method.id !== id));
+      const handleDeletePaymentMethod = async () => {
+        try {
+          setIsLoading(true);
+          
+          // Find the method to check if it's default
+          const methodToDelete = paymentMethods.find(m => m.id === id);
+          
+          // Delete from the database
+          await deletePaymentMethodService(id);
+          
+          // Update local state
+          setPaymentMethods(prev => prev.filter(method => method.id !== id));
+          
+          toast.success('Payment method deleted successfully');
+        } catch (error) {
+          console.error('Failed to delete payment method:', error);
+          toast.error('Failed to delete payment method. Please try again.');
+        } finally {
+          setIsLoading(false);
+        }
       }
+      handleDeletePaymentMethod();
     }
   };
   
@@ -203,7 +270,7 @@ export default function SavedPayments() {
     }
   };
   
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validate form
@@ -211,20 +278,38 @@ export default function SavedPayments() {
       return;
     }
     
+    setIsLoading(true);
+    
     // Process the form
-    if (editingId) {
-      // Update existing payment method
-      const updatedMethod = {
-        id: editingId,
-        name: formData.name,
-        expiryMonth: formData.expiryMonth,
-        expiryYear: formData.expiryYear,
-        isDefault: formData.isDefault
-      };
-      
-      const success = updatePaymentMethod(updatedMethod);
-      
-      if (success) {
+    try {
+      if (editingId) {
+        // Update existing payment method
+        const methodToUpdate = paymentMethods.find(m => m.id === editingId);
+        
+        const updatedMethod = {
+          ...methodToUpdate,
+          name: formData.name,
+          expiryMonth: formData.expiryMonth,
+          expiryYear: formData.expiryYear,
+          isDefault: formData.isDefault
+        };
+        
+        // If this is becoming the default, update other methods too
+        if (formData.isDefault && !methodToUpdate.isDefault) {
+          for (const method of paymentMethods) {
+            if (method.id !== editingId && method.isDefault) {
+              await updatePaymentMethodService(method.id, {
+                ...method,
+                isDefault: false
+              });
+            }
+          }
+        }
+        
+        // Update the method in the database
+        await updatePaymentMethodService(editingId, updatedMethod);
+        
+        // Update local state
         setPaymentMethods(prev => 
           prev.map(method => {
             if (method.id === editingId) {
@@ -239,34 +324,68 @@ export default function SavedPayments() {
             return formData.isDefault ? { ...method, isDefault: false } : method;
           })
         );
-      }
-    } else {
-      // Add new payment method
-      const cardNumber = formData.cardNumber.replace(/\s+/g, '');
-      const cardType = detectCardType(cardNumber);
-      const last4 = cardNumber.slice(-4);
+        
+        toast.success('Payment method updated successfully');
+      } else {
+        // Add new payment method
+        const cardNumber = formData.cardNumber.replace(/\s+/g, '');
+        const cardType = detectCardType(cardNumber);
+        const last4 = cardNumber.slice(-4);
+        
+        // Prepare the new method data
+        const newMethodData = { 
+          Name: formData.name,
+          type: cardType,
+          last4: last4,
+          expiryMonth: formData.expiryMonth,
+          expiryYear: formData.expiryYear,
+          isDefault: formData.isDefault,
+          userId: currentUser.id
+        };
+        
+        // If this will be default, update existing methods first
+        if (formData.isDefault) {
+          for (const method of paymentMethods) {
+            if (method.isDefault) {
+              await updatePaymentMethodService(method.id, {
+                ...method,
+                isDefault: false
+              });
+            }
+          }
+        }
+        
+        // Create the new method in the database
+        const createdMethod = await createPaymentMethod(newMethodData);
+        
+        // Format the response for the UI
+        const newMethod = {
+          id: createdMethod.Id,
+          name: createdMethod.Name,
+          type: createdMethod.type,
+          last4: createdMethod.last4,
+          expiryMonth: createdMethod.expiryMonth,
+          expiryYear: createdMethod.expiryYear,
+          isDefault: createdMethod.isDefault,
+          userId: createdMethod.userId
+        };
       
-      const newMethod = { 
-        id: Date.now().toString(),
-        name: formData.name,
-        type: cardType,
-        last4: last4,
-        expiryMonth: formData.expiryMonth,
-        expiryYear: formData.expiryYear,
-        isDefault: formData.isDefault 
-      };
-      
-      const success = addPaymentMethod(newMethod);
-      
-      if (success) {
-        if (newMethod.isDefault) {
+        // Update the local state
+        if (formData.isDefault) {
           setPaymentMethods(prev => 
             [...prev.map(method => ({ ...method, isDefault: false })), newMethod]
           );
         } else {
           setPaymentMethods(prev => [...prev, newMethod]);
         }
+        
+        toast.success('Payment method added successfully');
       }
+    } catch (error) {
+      console.error('Error processing payment method:', error);
+      toast.error('Failed to process payment method. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
     
     setShowAddForm(false);
@@ -280,9 +399,9 @@ export default function SavedPayments() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-4">
         <h1 className="text-2xl font-semibold text-surface-800 dark:text-white">Payment Methods</h1>
-        <button 
+        <button
           onClick={() => {
             resetForm();
             setEditingId(null);
@@ -411,7 +530,9 @@ export default function SavedPayments() {
               Cancel
             </button>
             <button type="submit" className="btn-primary">
-              {editingId ? 'Update Payment Method' : 'Save Payment Method'}
+              {isLoading ? 'Processing...' : 
+                (editingId ? 'Update Payment Method' : 'Save Payment Method')
+              }
             </button>
           </div>
         </form>
@@ -419,7 +540,12 @@ export default function SavedPayments() {
 
       {/* Payment methods list */}
       <div className="space-y-4">
-        {paymentMethods.length === 0 ? (
+        {isLoading && paymentMethods.length === 0 ? (
+          <div className="rounded-xl bg-white p-8 text-center shadow-soft dark:bg-surface-800">
+            <p className="text-surface-600 dark:text-surface-400">Loading payment methods...</p>
+          </div>
+        ) : 
+        paymentMethods.length === 0 ? (
           <div className="rounded-xl bg-white p-8 text-center shadow-soft dark:bg-surface-800">
             <p className="text-surface-600 dark:text-surface-400">You don't have any saved payment methods yet.</p>
           </div>

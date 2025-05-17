@@ -114,3 +114,28 @@ export const updatePaymentMethod = async (paymentMethodId, paymentData) => {
     throw error;
   }
 };
+
+// Delete a payment method
+export const deletePaymentMethod = async (paymentMethodId) => {
+  try {
+    // Initialize ApperClient
+    const { ApperClient } = window.ApperSDK;
+    const apperClient = new ApperClient({
+      apperProjectId: import.meta.env.VITE_APPER_PROJECT_ID,
+      apperPublicKey: import.meta.env.VITE_APPER_PUBLIC_KEY
+    });
+
+    const tableName = 'payment_method';
+    
+    // Delete the payment method record
+    const response = await apperClient.deleteRecord(tableName, {
+      RecordIds: [paymentMethodId]
+    });
+    
+    return response && response.success;
+    
+  } catch (error) {
+    console.error('Error deleting payment method:', error);
+    throw error;
+  }
+};
