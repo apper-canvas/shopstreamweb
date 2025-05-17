@@ -39,6 +39,7 @@ const DUMMY_USER = {
       expiryYear: "2024",
       isDefault: true
     }
+  ],
   ]
 };
 
@@ -84,7 +85,7 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, isAdmin = false) => {
     try {
       // Simulating API request
       setLoading(true);
@@ -98,7 +99,8 @@ export function AuthProvider({ children }) {
       const newUser = {
         ...DUMMY_USER,
         name,
-        email
+        email,
+        isAdmin
       };
       
       setCurrentUser(newUser);

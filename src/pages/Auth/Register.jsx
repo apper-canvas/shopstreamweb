@@ -19,6 +19,7 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   
@@ -65,7 +66,7 @@ export default function Register() {
     setIsSubmitting(true);
     
     try {
-      const success = await register(name, email, password);
+      const success = await register(name, email, password, isAdmin);
       if (success) {
         navigate('/dashboard');
       }
@@ -201,6 +202,23 @@ export default function Register() {
                   I accept the <a href="#" className="text-primary hover:underline">Terms of Service</a> and <a href="#" className="text-primary hover:underline">Privacy Policy</a>
                 </label>
                 {errors.acceptTerms && <p className="mt-1 text-sm text-secondary">{errors.acceptTerms}</p>}
+              </div>
+            </div>
+            
+            <div className="flex items-start">
+              <div className="flex h-5 items-center">
+                <input
+                  id="isAdmin"
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-surface-300 text-primary focus:ring-primary"
+                  checked={isAdmin}
+                  onChange={(e) => setIsAdmin(e.target.checked)}
+                />
+              </div>
+              <div className="ml-3 text-sm">
+                <label htmlFor="isAdmin" className="text-surface-700 dark:text-surface-300">
+                  Register as Admin (for accessing admin dashboard)
+                </label>
               </div>
             </div>
 
