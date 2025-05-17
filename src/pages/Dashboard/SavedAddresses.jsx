@@ -58,8 +58,8 @@ export default function SavedAddresses() {
       zipCode: '',
       country: 'United States',
       country: 'United States', 
-      country: 'United States',
-    setEditingAddressId(null);
+      isDefault: false
+    });
     });
     setShowAddressForm(true);
     setErrors({});
