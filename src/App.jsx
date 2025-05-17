@@ -257,66 +257,67 @@ function App() {
         {darkMode ? <SunIcon size={20} /> : <MoonIcon size={20} />}
       </button>
 
-        <Routes>
-          <Route path="/" element={<Home />} />
-          {/* Shop, Categories, Deals, and About routes */}
-          <Route path="/shop" element={<Shop />} />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/deals" element={<Deals />} />
-          <Route path="/about" element={<About />} />
+      <Routes>
+        {/* Public routes with MainLayout */}
+        <Route element={<MainLayout />}>
+          <Route index element={<Home />} />
+          <Route path="shop" element={<Shop />} />
+          <Route path="categories" element={<Categories />} />
+          <Route path="deals" element={<Deals />} />
+          <Route path="about" element={<About />} />
+          <Route path="cart" element={<Cart />} />
+          <Route path="checkout" element={<Checkout />} />
+          <Route path="order-confirmation/:orderId" element={<OrderConfirmation />} />
+          <Route path="track-order" element={<OrderTracking />} />
+          <Route path="product/:id" element={<ProductDetail />} />
           
-          {/* Cart route */}
-          <Route path="/cart" element={<Cart />} />
-
-          {/* Checkout routes */}
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
-
-          {/* Order tracking routes */}
-          <Route path="/track-order" element={<OrderTracking />} />
-          
-          {/* Product detail route */}
-          <Route path="/product/:id" element={<ProductDetail />} />
-          
-          {/* Auth routes */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-
           {/* Footer pages */}
-          <Route path="/terms-of-service" element={<TermsOfService />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/faq" element={<FAQ />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/careers" element={<Careers />} />
-          <Route path="/return-policy" element={<ReturnPolicy />} />
-          <Route path="/shipping-info" element={<ShippingInfo />} />
-          
-          {/* Protected dashboard routes */}
-          <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
-            <Route index element={<DashboardHome />} />
-            <Route path="account" element={<AccountSettings />} />
-            <Route path="addresses" element={<SavedAddresses />} />
-            <Route path="payments" element={<SavedPayments />} />
-            <Route path="orders" element={<OrderHistory />} />
-            <Route path="orders/:orderId" element={<OrderDetails />} />
-          </Route>
+          <Route path="terms-of-service" element={<TermsOfService />} />
+          <Route path="privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="faq" element={<FAQ />} />
+          <Route path="contact" element={<Contact />} />
+          <Route path="careers" element={<Careers />} />
+          <Route path="return-policy" element={<ReturnPolicy />} />
+          <Route path="shipping-info" element={<ShippingInfo />} />
+        </Route>
 
-          {/* Admin routes */}
-          <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
-            <Route index element={<AdminDashboard />} />
-            <Route path="products" element={<ProductList />} />
-            <Route path="products/new" element={<ProductList />} />
-            <Route path="products/edit/:id" element={<ProductList />} />
-          </Route>
+        {/* Auth routes without MainLayout */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-          {/* 404 route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        {/* Protected dashboard routes */}
+        <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+          <Route index element={<DashboardHome />} />
+          <Route path="account" element={<AccountSettings />} />
+          <Route path="addresses" element={<SavedAddresses />} />
+          <Route path="payments" element={<SavedPayments />} />
+          <Route path="orders" element={<OrderHistory />} />
+          <Route path="orders/:orderId" element={<OrderDetails />} />
+        </Route>
+
+        {/* Admin routes */}
+        <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="products" element={<ProductList />} />
+          <Route path="products/new" element={<ProductList />} />
+          <Route path="products/edit/:id" element={<ProductList />} />
+        </Route>
+
+        {/* 404 route */}
+        <Route path="*" element={<MainLayout><NotFound /></MainLayout>} />
+      </Routes>
       <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar={false} />
 
     </>
   );
 }
+
+// Wrap MainLayout component with Outlet for nested routes
+const MainLayout = ({ children }) => (
+  <div>
+    {children || <Outlet />}
+  </div>
+);
 
 // Wrap the App component with AuthProvider
 function AppWithAuth() {
