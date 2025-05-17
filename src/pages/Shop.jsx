@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { getIcon } from '../utils/iconUtils';
 
 const FilterIcon = getIcon('Filter');
@@ -12,6 +12,7 @@ export default function Shop() {
   const [viewMode, setViewMode] = useState('grid');
   const [searchQuery, setSearchQuery] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
+  const [searchParams] = useSearchParams();
   
   // Sample product data
   const products = [
@@ -73,6 +74,18 @@ export default function Shop() {
     }
   ];
 
+  // Filter products based on category from URL parameter
+  const [filteredProducts, setFilteredProducts] = useState(products);
+  const categoryParam = searchParams.get('category');
+
+  useEffect(() => {
+    if (categoryParam) {
+      setFilteredProducts(products.filter(product => product.category === categoryParam));
+    } else {
+      setFilteredProducts(products);
+    }
+  }, [categoryParam]);
+
   const handleSearch = (e) => {
     e.preventDefault();
     // Search functionality would be implemented here
@@ -85,7 +98,7 @@ export default function Shop() {
   return (
     <div className="min-h-screen bg-surface-50 transition-colors dark:bg-surface-900">
       <main className="container mx-auto px-4 py-8">
-        <h1 className="mb-6 text-3xl font-bold text-surface-800 dark:text-white">Shop</h1>
+        <h1 className="mb-6 text-3xl font-bold text-surface-800 dark:text-white">{categoryParam ? `${categoryParam}` : 'Shop'}</h1>
         
         {/* Search and filter controls */}
         <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
@@ -119,7 +132,7 @@ export default function Shop() {
         
         {/* Products grid */}
         <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1'}`}>
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <Link key={product.id} to={`/product/${product.id}`} className="group overflow-hidden rounded-lg bg-white shadow-soft transition-all hover:shadow-md dark:bg-surface-800">
               <div className={`${viewMode === 'grid' ? 'aspect-square w-full' : 'flex h-40'}`}>
                 <img src={product.image} alt={product.name} className={`h-full w-full object-cover transition-transform duration-300 ${viewMode === 'grid' ? 'group-hover:scale-105' : 'w-40'}`} />

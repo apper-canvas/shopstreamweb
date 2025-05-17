@@ -245,7 +245,7 @@ export default function MainFeature() {
     // Apply sorting
     switch (sortOption) {
       case "featured":
-        result.sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0) * -1);
+        result.sort((a, b) => (a.isFeatured ? -1 : 1) - (b.isFeatured ? -1 : 1));
         break;
       case "priceAsc":
         result.sort((a, b) => (a.salePrice || a.price) - (b.salePrice || b.price));
