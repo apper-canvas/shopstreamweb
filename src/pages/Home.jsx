@@ -1,236 +1,30 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
-import { toast } from 'react-toastify';
 import { getIcon } from '../utils/iconUtils';
 import MainFeature from '../components/MainFeature';
-
 import CartPreview from '../components/CartPreview';
-// Get icon components
-const ShoppingCartIcon = getIcon('ShoppingCart');
-const SearchIcon = getIcon('Search');
-const MenuIcon = getIcon('Menu');
-const XIcon = getIcon('X');
-const HeartIcon = getIcon('Heart');
-const UserIcon = getIcon('User');
 import UserDropdown from '../components/UserDropdown';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function Home() {
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [wishlistItems, setWishlistItems] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const userMenuRef = useRef(null);
-  const navigate = useNavigate();
   const { currentUser } = useAuth();
-
-  const toggleMobileMenu = () => {
   const { getCartItemCount } = useCart();
-    setMobileMenuOpen(prev => !prev);
-  };
-  
-  // Close mobile menu if screen resizes above mobile breakpoint
-  useEffect(() => {
-    const handleResize = () => window.innerWidth >= 768 && setMobileMenuOpen(false);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  const toggleUserMenu = () => {
-    setShowUserMenu(prev => !prev);
-  };
-  
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      toast.info(`Searching for "${searchQuery}"...`);
-      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
-    }
-  };
-
-  // Close the user menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
-        setShowUserMenu(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-              <CartPreview />
-  // Navigation handler for menu items
-  const handleNavigation = (path) => {
-    if (mobileMenuOpen) setMobileMenuOpen(false);
-    navigate(path);
-  };
-
-  // Add item to wishlist
-  const addToWishlist = (item) => {
-    setWishlistItems(prev => [...prev, item]);
-    toast.success('Item added to wishlist!');
-  };
 
   // Add item to cart
   const addToCart = (item) => {
     setCartItems(prev => [...prev, item]);
-    toast.success('Item added to cart!');
-  };
-
-  // Sample navigation paths for main menu
-  const navigationPaths = {
-    'Home': '/',
-    'Shop': '/shop',
-    'Categories': '/categories',
-    'Deals': '/deals',
-    'About': '/about'
   };
 
   return (
     <div className="min-h-screen bg-surface-50 transition-colors dark:bg-surface-900">
-      {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-surface-200 bg-white/80 backdrop-blur-md dark:border-surface-700 dark:bg-surface-800/80">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          {/* Logo */}
-          <div className="flex items-center">
-            <motion.div as={Link} to="/"
-              className="flex items-center gap-2 text-xl font-bold text-primary"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <ShoppingCartIcon className="h-7 w-7" />
-              <span>ShopStream</span>
-            </motion.div>
-          </div>
-          
-          {/* Desktop Navigation */}
-          <nav className="hidden md:block">
-            <ul className="flex space-x-8">
-              {['Home', 'Shop', 'Categories', 'Deals', 'About'].map((item) => (
-                <li key={item}>
-                  <Link 
-                    to={navigationPaths[item] || '#'}
-                    className="text-surface-600 transition-colors hover:text-primary dark:text-surface-300 dark:hover:text-primary-light"
-                    onClick={() => handleNavigation(navigationPaths[item] || '#')}
-                   >
-                    {item}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-          
-          {/* Search, cart, favorites */}
-          <div className="flex items-center gap-2 md:gap-4">
-            {/* Search form */}
-            <form onSubmit={handleSearch} className="relative hidden md:block">
-              <input
-                type="text"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-10 w-40 rounded-lg border border-surface-300 bg-surface-100 pl-3 pr-10 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-surface-600 dark:bg-surface-700 dark:text-white lg:w-64"
-              />
-              <button
-                type="submit"
-                className="absolute right-2 top-1/2 -translate-y-1/2 text-surface-500 hover:text-primary dark:text-surface-400"
-              >
-                <SearchIcon className="h-5 w-5" />
-              </button>
-            </form>
-            
-            {/* Action buttons */}
-            <button 
-              className="relative rounded-full p-2 text-surface-600 hover:bg-surface-100 hover:text-primary dark:text-surface-300 dark:hover:bg-surface-700 dark:hover:text-primary-light"
-              onClick={() => navigate('/wishlist')}
-              aria-label="Wishlist"
-            >
-              <HeartIcon className="h-5 w-5" />
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs text-white">{wishlistItems.length}</span>
-            </button>
-            
-            <button 
-              className="relative rounded-full p-2 text-surface-600 hover:bg-surface-100 hover:text-primary dark:text-surface-300 dark:hover:bg-surface-700 dark:hover:text-primary-light"
-              onClick={() => navigate('/cart')}
-              aria-label="Shopping Cart"
-            >
-              <ShoppingCartIcon className="h-5 w-5" />
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs text-white">{cartItems.length}</span>
-            </button>
-
-            {/* User profile dropdown */}
-            <button 
-              className="relative rounded-full p-2 text-surface-600 hover:bg-surface-100 hover:text-primary dark:text-surface-300 dark:hover:bg-surface-700 dark:hover:text-primary-light"
-              onClick={toggleUserMenu}
-              ref={userMenuRef}
-            >
-              <UserIcon className="h-5 w-5" />
-              
-              {/* User dropdown menu - conditionally rendered and properly imported */}
-              {showUserMenu && (
-                <UserDropdown />
-              )}
-            </button>
-            
-            {/* Mobile menu button */}
-            <button 
-              className="rounded-lg p-2 text-surface-600 hover:bg-surface-100 dark:text-surface-300 dark:hover:bg-surface-700 md:hidden"
-              onClick={toggleMobileMenu}
-            >
-              {mobileMenuOpen ? <XIcon className="h-6 w-6" /> : <MenuIcon className="h-6 w-6" />}
-            </button>
-          </div>
-        </div>
-        
-        {/* Mobile menu */}
-        {mobileMenuOpen && (
-          <motion.div 
-            className="container mx-auto px-4 pb-4 md:hidden"
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            <form onSubmit={handleSearch} className="mb-4">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-10 w-full rounded-lg border border-surface-300 bg-surface-100 pl-3 pr-10 text-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-surface-600 dark:bg-surface-700 dark:text-white"
-                />
-                <button
-                  type="submit"
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-surface-500 hover:text-primary dark:text-surface-400"
-                >
-                  <SearchIcon className="h-5 w-5" />
-                </button>
-              </div>
-            </form>
-            
-            <nav>
-              <ul className="flex flex-col space-y-2">
-                {['Home', 'Shop', 'Categories', 'Deals', 'About'].map((item) => (
-                  <li key={item}>
-              <Link 
-                      to={navigationPaths[item] || '#'}
-                to={`/product/${product.id}`}
-                    >
-                      {item}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </motion.div>
-        )}
-      </header>
+      {/* Cart Preview Component */}
+      <CartPreview />
 
       <main>
         {/* Hero Banner */}
@@ -379,6 +173,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="bg-surface-800 py-12 text-surface-300 dark:bg-surface-900">
+        {/* Get ShoppingCartIcon for the footer */}
         <div className="container mx-auto px-4">
           <div className="grid gap-8 md:grid-cols-4">
             <div>
@@ -392,6 +187,7 @@ export default function Home() {
               <div className="flex space-x-4">
                 {["Facebook", "Twitter", "Instagram", "YouTube"].map(social => {
                   const SocialIcon = getIcon(social);
+                  
                   return (
                     <a key={social} href="#" className="text-surface-400 hover:text-white">
                       <SocialIcon className="h-5 w-5" />
