@@ -121,7 +121,8 @@ export function CartProvider({ children }) {
 
   // Place order function
   const placeOrder = (shippingInfo, paymentInfo) => {
-      toast.warning("Your cart is empty");
+    if (cartItems.length === 0) {
+      // Cart is empty, cannot place order
       return { success: false };
     }
 
