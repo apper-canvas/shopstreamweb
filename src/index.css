@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --toastify-color-light: theme('colors.surface.50');
+  --toastify-color-dark: theme('colors.surface.800');
+  --toastify-color-info: theme('colors.primary.DEFAULT');
+  --toastify-color-success: theme('colors.green.500');
+  --toastify-color-warning: theme('colors.accent');
+  --toastify-color-error: theme('colors.secondary.DEFAULT');
+}
+
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  
+  body {
+    @apply font-sans text-surface-800 dark:text-surface-200 antialiased;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold;
+  }
+  
+  h1 {
+    @apply text-3xl md:text-4xl lg:text-5xl;
+  }
+  
+  h2 {
+    @apply text-2xl md:text-3xl lg:text-4xl;
+  }
+  
+  h3 {
+    @apply text-xl md:text-2xl lg:text-3xl;
+  }
+  
+  h4 {
+    @apply text-lg md:text-xl;
+  }
+  
+  h5 {
+    @apply text-base md:text-lg;
+  }
+  
+  h6 {
+    @apply text-sm md:text-base font-semibold;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg px-5 py-2.5 text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  .btn-primary {
+    @apply btn bg-primary text-white hover:bg-primary-dark focus:ring-primary-light;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-secondary text-white hover:bg-secondary-dark focus:ring-secondary-light;
+  }
+  
+  .btn-outline {
+    @apply btn border-2 border-primary text-primary hover:bg-primary hover:text-white focus:ring-primary-light;
+  }
+  
+  .input-field {
+    @apply w-full rounded-lg border border-surface-300 bg-white px-4 py-3 text-surface-800 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary dark:border-surface-600 dark:bg-surface-800 dark:text-white;
+  }
+  
+  .card {
+    @apply rounded-xl bg-white p-5 shadow-soft dark:bg-surface-800;
+  }
+  
+  .neu-card {
+    @apply rounded-xl bg-white p-5 shadow-neu-light dark:bg-surface-800 dark:shadow-neu-dark;
+  }
+  
+  .product-card {
+    @apply relative overflow-hidden rounded-xl bg-white transition-all hover:shadow-lg dark:bg-surface-800;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* Import Toastify CSS */
+@import 'react-toastify/dist/ReactToastify.css';
