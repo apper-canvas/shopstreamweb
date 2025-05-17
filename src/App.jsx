@@ -42,6 +42,47 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+// Main layout component with sticky header and footer
+const MainLayout = ({ children }) => {
+  return (
+    <div className="flex min-h-screen flex-col">
+      {/* Sticky Header */}
+      <header className="header-sticky bg-white shadow-md dark:bg-surface-800">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <a href="/" className="text-xl font-bold text-primary">ShopStream</a>
+              <nav className="hidden md:block">
+                <ul className="flex space-x-6">
+                  <li><a href="/" className="hover:text-primary">Home</a></li>
+                  <li><a href="/shop" className="hover:text-primary">Shop</a></li>
+                  <li><a href="/categories" className="hover:text-primary">Categories</a></li>
+                  <li><a href="/deals" className="hover:text-primary">Deals</a></li>
+                  <li><a href="/about" className="hover:text-primary">About</a></li>
+                </ul>
+              </nav>
+            </div>
+            <div className="flex items-center space-x-4">
+              <a href="/cart" className="hover:text-primary">Cart</a>
+              <a href="/login" className="hover:text-primary">Login</a>
+            </div>
+          </div>
+        </div>
+      </header>
+      
+      {/* Main Content */}
+      <main className="flex-grow">{children}</main>
+      
+      {/* Sticky Footer */}
+      <footer className="footer-sticky bg-surface-800 py-6 text-white dark:bg-surface-900">
+        <div className="container mx-auto px-4 text-center">
+          <p>© {new Date().getFullYear()} ShopStream. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
 function App() {
   const [darkMode, setDarkMode] = useState(() => {
     const savedMode = localStorage.getItem('darkMode');
@@ -74,38 +115,40 @@ function App() {
       </button>
 
       {/* Application routes */}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        {/* Shop, Categories, Deals, and About routes */}
-        <Route path="/shop" element={<Shop />} />
-        <Route path="/categories" element={<Categories />} />
-        <Route path="/deals" element={<Deals />} />
-        <Route path="/about" element={<About />} />
-        
-        {/* Cart route */}
-        <Route path="/cart" element={<Cart />} />
+      <MainLayout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          {/* Shop, Categories, Deals, and About routes */}
+          <Route path="/shop" element={<Shop />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/deals" element={<Deals />} />
+          <Route path="/about" element={<About />} />
+          
+          {/* Cart route */}
+          <Route path="/cart" element={<Cart />} />
 
-        {/* Checkout routes */}
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
-        
-        {/* Product detail route */}
-        <Route path="/product/:id" element={<ProductDetail />} />
-        
-        {/* Auth routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        
-        {/* Protected dashboard routes */}
-        <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
-          <Route index element={<DashboardHome />} />
-          <Route path="account" element={<AccountSettings />} />
-          <Route path="addresses" element={<SavedAddresses />} />
-          <Route path="payments" element={<SavedPayments />} />
-          <Route path="orders" element={<OrderHistory />} />
-        </Route>
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          {/* Checkout routes */}
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+          
+          {/* Product detail route */}
+          <Route path="/product/:id" element={<ProductDetail />} />
+          
+          {/* Auth routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          
+          {/* Protected dashboard routes */}
+          <Route path="/dashboard" element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+            <Route index element={<DashboardHome />} />
+            <Route path="account" element={<AccountSettings />} />
+            <Route path="addresses" element={<SavedAddresses />} />
+            <Route path="payments" element={<SavedPayments />} />
+            <Route path="orders" element={<OrderHistory />} />
+          </Route>
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </MainLayout>
 
     </>
   );

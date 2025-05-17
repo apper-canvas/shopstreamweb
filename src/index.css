@@ -96,6 +96,17 @@
   .text-balance {
     text-wrap: balance;
   }
+  
+  .header-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+  }
+  
+  .footer-sticky {
+    position: sticky;
+    bottom: 0;
+  }
 }
 
 /* Import Toastify CSS */
