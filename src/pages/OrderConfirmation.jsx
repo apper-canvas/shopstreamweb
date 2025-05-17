@@ -98,16 +98,21 @@ export default function OrderConfirmation() {
   
   const orderDate = formatDate(order.date);
   
-  // Safely parse JSON to avoid errors
+  // Enhanced safe JSON parsing with type checking
   const safeParseJSON = (jsonString, defaultValue = {}) => {
     try {
-      return typeof jsonString === 'string' ? JSON.parse(jsonString) : jsonString || defaultValue;
+      if (typeof jsonString === 'string') {
+        return JSON.parse(jsonString);
+      } else if (jsonString && typeof jsonString === 'object') {
+        return jsonString;
+      } else {
+        return defaultValue;
+      }
     } catch (error) {
       console.error('Error parsing JSON:', error);
       return defaultValue;
     }
   };
-  
   // Ensure shipping info exists and has expected structure
   const shippingInfo = safeParseJSON(order.shippingInfo, {
     fullName: 'N/A',
