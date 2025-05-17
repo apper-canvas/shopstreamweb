@@ -86,19 +86,6 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
-function App() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { user, isAuthenticated } = useSelector((state) => state.user);
-  const [email, setEmail] = useState('');
-  const handleSubscribe = (e) => {
-    e.preventDefault();
-    
-    // Email validation
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-      return;
-    }
 const MainLayout = ({ children }) => {
   const { user, isAuthenticated } = useSelector((state) => state.user);
   const [email, setEmail] = useState('');
