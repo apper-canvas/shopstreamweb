@@ -37,6 +37,7 @@ import AdminDashboard from './pages/Admin/AdminDashboard';
 import ProductList from './pages/Admin/Products/ProductList';
 // Import toast for notifications
 import { ToastContainer, toast } from 'react-toastify';
+import AddEditProduct from './pages/Admin/Products/AddEditProduct';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Get icon components
@@ -299,7 +300,7 @@ function App() {
         <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
           <Route index element={<AdminDashboard />} />
           <Route path="products" element={<ProductList />} />
-          <Route path="products/new" element={<ProductList />} />
+          <Route path="products/new" element={<AddEditProduct />} />
           <Route path="products/edit/:id" element={<ProductList />} />
         </Route>
 
