@@ -7,6 +7,8 @@ import Shop from './pages/Shop';
 import Categories from './pages/Categories';
 import Deals from './pages/Deals';
 import About from './pages/About';
+import OrderTracking from './pages/OrderTracking';
+import OrderDetails from './pages/OrderDetails';
 import Cart from './pages/Cart';
 import ProductDetail from './pages/ProductDetail';
 import Checkout from './pages/Checkout';
@@ -59,6 +61,7 @@ const MainLayout = ({ children }) => {
                   <li><a href="/categories" className="hover:text-primary">Categories</a></li>
                   <li><a href="/deals" className="hover:text-primary">Deals</a></li>
                   <li><a href="/about" className="hover:text-primary">About</a></li>
+                  <li><a href="/track-order" className="hover:text-primary">Track Order</a></li>
                 </ul>
               </nav>
             </div>
@@ -130,6 +133,9 @@ function App() {
           {/* Checkout routes */}
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+
+          {/* Order tracking routes */}
+          <Route path="/track-order" element={<OrderTracking />} />
           
           {/* Product detail route */}
           <Route path="/product/:id" element={<ProductDetail />} />
@@ -145,6 +151,7 @@ function App() {
             <Route path="addresses" element={<SavedAddresses />} />
             <Route path="payments" element={<SavedPayments />} />
             <Route path="orders" element={<OrderHistory />} />
+            <Route path="orders/:orderId" element={<OrderDetails />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

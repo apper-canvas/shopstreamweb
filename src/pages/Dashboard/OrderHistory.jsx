@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getIcon } from '../../utils/iconUtils';
+import { useCart } from '../../contexts/CartContext';
 
 // Get icons
 const ShoppingBag = getIcon('ShoppingBag');
@@ -10,47 +11,33 @@ const CheckCircle = getIcon('CheckCircle');
 const Truck = getIcon('Truck');
 const Package = getIcon('Package');
 const Clock = getIcon('Clock');
+import { Link } from 'react-router-dom';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function OrderHistory() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const { getUserOrders, getOrderStatus } = useCart();
+  const { currentUser } = useAuth();
+  const [orders, setOrders] = useState([]);
   
-  const orders = [
-    {
-      id: 'ORD-5432112',
-      date: '2023-11-15',
-      status: 'delivered',
-      total: 129.99,
-      items: [
-        { name: 'Wireless Headphones', quantity: 1, price: 99.99 },
-        { name: 'USB-C Cable', quantity: 1, price: 12.99 },
-        { name: 'Phone Case', quantity: 1, price: 17.99 }
-      ]
-    },
-    {
-      id: 'ORD-7865321',
-      date: '2023-12-01',
-      status: 'shipped',
-      total: 249.99,
-      trackingNumber: 'TRK-9876543',
-      estimatedDelivery: '2023-12-05',
-      items: [
-        { name: 'Smart Watch', quantity: 1, price: 199.99 },
-        { name: 'Watch Band', quantity: 2, price: 24.99 }
-      ]
-    },
-    {
-      id: 'ORD-9825631',
-      date: '2023-12-10',
-      status: 'processing',
-      total: 59.99,
-      items: [
-        { name: 'Wireless Charger', quantity: 1, price: 39.99 },
-        { name: 'Screen Protector', quantity: 1, price: 19.99 }
-      ]
+  // Fetch user orders
+  useEffect(() => {
+    if (currentUser) {
+      // Get orders for current user
+      const userOrders = getUserOrders(currentUser.email);
+      
+      // Update order statuses
+      const updatedOrders = userOrders.map(order => {
+        // Update status based on order date
+        getOrderStatus(order.id);
+        return order;
+      });
+      
+      setOrders(userOrders);
     }
-  ];
-  
+  }, [currentUser, getUserOrders, getOrderStatus]);
+
   const filteredOrders = orders.filter(order => {
     // Filter by status
     if (statusFilter !== 'all' && order.status !== statusFilter) {
@@ -113,7 +100,7 @@ export default function OrderHistory() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-semibold text-surface-800 dark:text-white">Order History</h1>
+      <h1 className="text-2xl font-semibold text-surface-800 dark:text-white">My Orders</h1>
       
       {/* Filters and search */}
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -209,10 +196,10 @@ export default function OrderHistory() {
                 )}
                 
                 <div className="flex justify-end">
-                  <button className="flex items-center text-sm font-medium text-primary hover:text-primary-dark">
+                  <Link to={`/dashboard/orders/${order.id}`} className="flex items-center text-sm font-medium text-primary hover:text-primary-dark">
                     View Order Details
                     <ChevronRight className="ml-1 h-4 w-4" />
-                  </button>
+                  </Link>
                 </div>
               </div>
             );

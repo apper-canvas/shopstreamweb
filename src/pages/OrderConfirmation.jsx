@@ -76,6 +76,26 @@ export default function OrderConfirmation() {
           <p className="mb-6 text-lg text-surface-600 dark:text-surface-400">Your order has been received and is being processed.</p>
           
           <div className="mb-8 rounded-lg bg-surface-50 p-6 text-left dark:bg-surface-700">
+            {/* Order status */}
+            <div className="mb-6 rounded-lg bg-yellow-100 p-4 dark:bg-yellow-900/30">
+              <div className="flex items-center">
+                <ShoppingBagIcon size={24} className="mr-2 text-yellow-500" />
+                <div>
+                  <h3 className="font-medium text-yellow-700 dark:text-yellow-400">Processing</h3>
+                  <p className="text-surface-700 dark:text-surface-300">
+                    Your order is being prepared. You will receive an email notification when it ships.
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            {/* Track order button */}
+            <div className="mb-4 flex justify-center">
+              <Link to={`/track-order?orderId=${order.id}`} className="inline-flex items-center rounded-lg bg-primary px-6 py-2 font-medium text-white hover:bg-primary-dark">
+                <TruckIcon size={20} className="mr-2" />
+                Track Your Order
+              </Link>
+            </div>
             <div className="mb-4 grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm font-medium text-surface-500 dark:text-surface-400">Order Number</p>

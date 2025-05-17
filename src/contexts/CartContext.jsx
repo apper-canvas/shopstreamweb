@@ -5,7 +5,8 @@ const CartContext = createContext(null);
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [lastOrderId, setLastOrderId] = useState(null);
+  const [orders, setOrders] = useState([]);
+  const [lastOrderId, setLastOrderId] = useState(null); 
 
   // Load cart items from localStorage
   useEffect(() => {
@@ -16,12 +17,28 @@ export function CartProvider({ children }) {
     setLoading(false);
   }, []);
 
+  // Load orders from localStorage
+  useEffect(() => {
+    const storedOrders = localStorage.getItem('orders');
+    if (storedOrders) {
+      setOrders(JSON.parse(storedOrders));
+    }
+    setLoading(false);
+  }, []);
+
   // Save cart items to localStorage whenever they change
   useEffect(() => {
     if (!loading) {
       localStorage.setItem('cartItems', JSON.stringify(cartItems));
     }
   }, [cartItems, loading]);
+
+  // Save orders to localStorage whenever they change
+  useEffect(() => {
+    if (!loading) {
+      localStorage.setItem('orders', JSON.stringify(orders));
+    }
+  }, [orders, loading]);
 
   // Add an item to the cart
   const addToCart = (product, quantity = 1, size = null) => {
@@ -118,6 +135,77 @@ export function CartProvider({ children }) {
     // Checkout functionality without toast notification
     return true;
   };
+  
+  // Get order by ID
+  const getOrderById = (orderId) => {
+    // First try to get from orders array
+    const order = orders.find(order => order.id === orderId);
+    if (order) return order;
+    
+    // If not found, try to get from localStorage directly
+    const storedOrder = localStorage.getItem(`order_${orderId}`);
+    if (storedOrder) {
+      return JSON.parse(storedOrder);
+    }
+    
+    return null;
+  };
+  
+  // Get all orders for the current user
+  const getUserOrders = (email) => {
+    if (!email) return [];
+    
+    return orders.filter(order => 
+      order.shippingInfo.email.toLowerCase() === email.toLowerCase()
+    );
+  };
+  
+  // Track order status
+  const getOrderStatus = (orderId) => {
+    const order = getOrderById(orderId);
+    if (!order) return null;
+    
+    // If order has status already, return it
+    if (order.status) return order.status;
+    
+    // Determine status based on order date for demo purposes
+    const orderDate = new Date(order.date);
+    const now = new Date();
+    const daysSinceOrder = Math.floor((now - orderDate) / (1000 * 60 * 60 * 24));
+    
+    let status = 'processing';
+    let trackingNumber = null;
+    let estimatedDelivery = null;
+    
+    if (daysSinceOrder >= 1) {
+      status = 'shipped';
+      trackingNumber = `TRK-${orderId.substring(4, 10)}`;
+      
+      const deliveryDate = new Date(orderDate);
+      deliveryDate.setDate(deliveryDate.getDate() + 5);
+      estimatedDelivery = deliveryDate.toISOString();
+    }
+    
+    if (daysSinceOrder >= 5) {
+      status = 'delivered';
+    }
+    
+    // Update order with status info
+    const updatedOrder = {
+      ...order,
+      status,
+      trackingNumber,
+      estimatedDelivery
+    };
+    
+    // Save updated order
+    localStorage.setItem(`order_${orderId}`, JSON.stringify(updatedOrder));
+    
+    // Update orders array
+    setOrders(prevOrders => prevOrders.map(o => o.id === orderId ? updatedOrder : o));
+    
+    return status;
+  };
 
   // Place order function
   const placeOrder = (shippingInfo, paymentInfo) => {
@@ -129,7 +217,7 @@ export function CartProvider({ children }) {
     try {
       // In a real app, this would send the order to a backend service
       // For now, we'll just generate a random order ID and clear the cart
-      const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
       
       // Create order object
       const order = {
@@ -140,11 +228,21 @@ export function CartProvider({ children }) {
         subtotal: getCartSubtotal(),
         tax: getCartTax(),
         total: getCartTotal(),
-        date: new Date().toISOString()
+        date: new Date().toISOString(),
+        status: 'processing'
       };
       
       // Store order data in localStorage for demo purposes
       localStorage.setItem(`order_${orderId}`, JSON.stringify(order));
+      
+      // Add to orders array
+      setOrders(prevOrders => [
+        ...prevOrders,
+        order
+      ]);
+      
+      // Clear cart after successful order
+      clearCart();
       setLastOrderId(orderId);
       return { success: true, orderId };
     } catch (error) {
@@ -165,7 +263,10 @@ export function CartProvider({ children }) {
     getCartTotal,
     checkout,
     placeOrder,
-    lastOrderId
+    lastOrderId,
+    getOrderById,
+    getUserOrders,
+    getOrderStatus
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
