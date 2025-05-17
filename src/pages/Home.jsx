@@ -116,7 +116,7 @@ export default function Home() {
                     onClick={() => handleNavigation(navigationPaths[item] || '#')}
                    >
                     {item}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -221,7 +221,7 @@ export default function Home() {
                       onClick={() => handleNavigation(navigationPaths[item] || '#')}
                     >
                       {item}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
