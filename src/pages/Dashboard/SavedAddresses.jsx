@@ -15,7 +15,6 @@ const X = getIcon('X');
 const CheckCircle = getIcon('CheckCircle');
 
 export default function SavedAddresses() {
-  const { currentUser, setCurrentUser } = useAuth();
   const { currentUser, updateAddress, addAddress, deleteAddress } = useAuth();
   const [showAddressForm, setShowAddressForm] = useState(false);
   const [editingAddressId, setEditingAddressId] = useState(null);
@@ -59,8 +58,9 @@ export default function SavedAddresses() {
       zipCode: '',
       country: 'United States',
       country: 'United States', 
-      isDefault: currentUser?.addresses?.length === 0 // Make default if it's the first address
+      country: 'United States',
     setEditingAddressId(null);
+    });
     setShowAddressForm(true);
     setErrors({});
   };
@@ -273,7 +273,7 @@ export default function SavedAddresses() {
                 checked={addressForm.isDefault}
                 onChange={handleInputChange}
                 className="h-4 w-4 rounded border-surface-300 text-primary focus:ring-primary"
-                disabled={addresses.length === 0} // Force default if it's the first address
+                disabled={currentUser?.addresses?.length === 0} // Force default if it's the first address
               />
               <label htmlFor="isDefault" className="ml-2 text-sm text-surface-700 dark:text-surface-300">
                 Set as default address
