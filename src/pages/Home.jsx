@@ -175,69 +175,6 @@ export default function Home() {
           </div>
         </section>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-surface-800 py-12 text-surface-300 dark:bg-surface-900">
-        {/* Get ShoppingCartIcon for the footer */}
-        <div className="container mx-auto px-4">
-          <div className="grid gap-8 md:grid-cols-4">
-            <div>
-              <div className="mb-4 flex items-center gap-2 text-xl font-bold text-white">
-                {/* Get ShoppingCart icon using the getIcon utility function */}
-                {(() => {
-                  const CartIcon = getIcon('ShoppingCart');
-                  return <CartIcon className="h-6 w-6" />;
-                })()}
-                <span>ShopStream</span>
-              </div>
-              <p className="mb-4 text-surface-400">
-                Your premier destination for online shopping with the best deals and quality products.
-              </p>
-              <div className="flex space-x-4">
-                {["Facebook", "Twitter", "Instagram", "YouTube"].map(social => {
-                  const SocialIcon = getIcon(social);
-                  
-                  return (
-                    <a key={social} href="#" className="text-surface-400 hover:text-white">
-                      <SocialIcon className="h-5 w-5" />
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
-            
-            {[
-              {
-                title: "Shop",
-                links: ["All Products", "New Arrivals", "Best Sellers", "Deals & Promotions", "Gift Cards"]
-              },
-              {
-                title: "Customer Service",
-                links: ["Contact Us", "FAQs", "Shipping Policy", "Returns & Exchanges", "Track Order"]
-              },
-              {
-                title: "About",
-                links: ["Our Story", "Blog", "Careers", "Press", "Sustainability"]
-              }
-            ].map((column) => (
-              <div key={column.title}>
-                <h4 className="mb-4 text-lg font-semibold text-white">{column.title}</h4>
-                <ul className="space-y-2">
-                  {column.links.map((link) => (
-                    <li key={link}>
-                      <a href="#" className="text-surface-400 hover:text-white">{link}</a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-          
-          <div className="mt-12 border-t border-surface-700 pt-6 text-center text-sm text-surface-500">
-            <p>© {new Date().getFullYear()} ShopStream. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
