@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, Navigate, useLocation, useNavigate, Link } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation, useNavigate, Link, Outlet } from 'react-router-dom';
 import { getIcon } from './utils/iconUtils';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
@@ -125,7 +125,7 @@ const MainLayout = ({ children }) => {
       </header>
       
       {/* Main Content */}
-      <main className="flex-grow">{children}</main>
+      <main className="flex-grow">{children || <Outlet />}</main>
       
       {/* Sticky Footer */}
       <footer className="bg-surface-800 text-white dark:bg-surface-900">
@@ -312,12 +312,6 @@ function App() {
   );
 }
 
-// Wrap MainLayout component with Outlet for nested routes
-const MainLayout = ({ children }) => (
-  <div>
-    {children || <Outlet />}
-  </div>
-);
 
 // Wrap the App component with AuthProvider
 function AppWithAuth() {
