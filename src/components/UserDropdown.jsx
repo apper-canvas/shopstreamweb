@@ -24,8 +24,10 @@ export default function UserDropdown() {
 
   // Handle user logout
   const handleLogout = () => {
-    logout();
-    navigate('/login');
+    logout()
+      .then(() => {
+        navigate('/login');
+      });
   };
 
   return (
@@ -34,7 +36,7 @@ export default function UserDropdown() {
         <p className="text-sm font-medium text-surface-900 dark:text-white">
           {currentUser ? `Hello, ${currentUser.name.split(' ')[0]}!` : 'Welcome!'}
         </p>
-        <p className="truncate text-xs text-surface-500 dark:text-surface-400">
+        <p className="truncate text-xs text-surface-500 dark:text-surface-400" title={currentUser?.email || 'user@example.com'}>
           {currentUser?.email || 'user@example.com'}
         </p>
       </div>
@@ -42,13 +44,21 @@ export default function UserDropdown() {
       <div className="py-1">
         {/* Menu items */}
         {menuItems.map((item, index) => (
-          <Link key={index} to={item.link} className="flex items-center px-4 py-2 text-sm text-surface-700 hover:bg-surface-100 dark:text-surface-300 dark:hover:bg-surface-700">
+          <Link 
+            key={index} 
+            to={item.link} 
+            className="flex items-center px-4 py-2 text-sm text-surface-700 hover:bg-surface-100 dark:text-surface-300 dark:hover:bg-surface-700"
+          >
             <item.icon className="mr-3 h-4 w-4" />
             {item.text}
           </Link>
         ))}
-        <button onClick={handleLogout} className="flex w-full items-center px-4 py-2 text-sm text-secondary hover:bg-surface-100 dark:hover:bg-surface-700">
-          <LogOut className="mr-3 h-4 w-4" /> Sign Out
+        <button 
+          onClick={handleLogout} 
+          className="flex w-full items-center px-4 py-2 text-sm text-secondary hover:bg-surface-100 dark:hover:bg-surface-700"
+          aria-label="Sign Out"
+        >
+          <LogOut className="mr-3 h-4 w-4" /> {currentUser ? "Sign Out" : "Sign In"}
         </button>
       </div>
     </div>

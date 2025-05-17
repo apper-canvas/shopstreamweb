@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { getIcon } from '../utils/iconUtils';
 import MainFeature from '../components/MainFeature';
@@ -11,16 +12,29 @@ const MenuIcon = getIcon('Menu');
 const XIcon = getIcon('X');
 const HeartIcon = getIcon('Heart');
 const UserIcon = getIcon('User');
+import UserDropdown from '../components/UserDropdown';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function Home() {
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [wishlistItems, setWishlistItems] = useState([]);
+  const [cartItems, setCartItems] = useState([]);
   const userMenuRef = useRef(null);
+  const navigate = useNavigate();
+  const { currentUser } = useAuth();
 
   const toggleMobileMenu = () => {
     setMobileMenuOpen(prev => !prev);
   };
+  
+  // Close mobile menu if screen resizes above mobile breakpoint
+  useEffect(() => {
+    const handleResize = () => window.innerWidth >= 768 && setMobileMenuOpen(false);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const toggleUserMenu = () => {
     setShowUserMenu(prev => !prev);
@@ -29,7 +43,8 @@ export default function Home() {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      toast.info(`Searching for "${searchQuery}"`);
+      toast.info(`Searching for "${searchQuery}"...`);
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
 
@@ -45,6 +60,33 @@ export default function Home() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Navigation handler for menu items
+  const handleNavigation = (path) => {
+    if (mobileMenuOpen) setMobileMenuOpen(false);
+    navigate(path);
+  };
+
+  // Add item to wishlist
+  const addToWishlist = (item) => {
+    setWishlistItems(prev => [...prev, item]);
+    toast.success('Item added to wishlist!');
+  };
+
+  // Add item to cart
+  const addToCart = (item) => {
+    setCartItems(prev => [...prev, item]);
+    toast.success('Item added to cart!');
+  };
+
+  // Sample navigation paths for main menu
+  const navigationPaths = {
+    'Home': '/',
+    'Shop': '/shop',
+    'Categories': '/categories',
+    'Deals': '/deals',
+    'About': '/about'
+  };
+
   return (
     <div className="min-h-screen bg-surface-50 transition-colors dark:bg-surface-900">
       {/* Header */}
@@ -52,7 +94,7 @@ export default function Home() {
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           {/* Logo */}
           <div className="flex items-center">
-            <motion.div
+            <motion.div as={Link} to="/"
               className="flex items-center gap-2 text-xl font-bold text-primary"
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -68,10 +110,11 @@ export default function Home() {
             <ul className="flex space-x-8">
               {['Home', 'Shop', 'Categories', 'Deals', 'About'].map((item) => (
                 <li key={item}>
-                  <a 
-                    href="#" 
+                  <Link 
+                    to={navigationPaths[item] || '#'}
                     className="text-surface-600 transition-colors hover:text-primary dark:text-surface-300 dark:hover:text-primary-light"
-                  >
+                    onClick={() => handleNavigation(navigationPaths[item] || '#')}
+                   >
                     {item}
                   </a>
                 </li>
@@ -99,14 +142,22 @@ export default function Home() {
             </form>
             
             {/* Action buttons */}
-            <button className="relative rounded-full p-2 text-surface-600 hover:bg-surface-100 hover:text-primary dark:text-surface-300 dark:hover:bg-surface-700 dark:hover:text-primary-light">
+            <button 
+              className="relative rounded-full p-2 text-surface-600 hover:bg-surface-100 hover:text-primary dark:text-surface-300 dark:hover:bg-surface-700 dark:hover:text-primary-light"
+              onClick={() => navigate('/wishlist')}
+              aria-label="Wishlist"
+            >
               <HeartIcon className="h-5 w-5" />
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs text-white">0</span>
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs text-white">{wishlistItems.length}</span>
             </button>
             
-            <button className="relative rounded-full p-2 text-surface-600 hover:bg-surface-100 hover:text-primary dark:text-surface-300 dark:hover:bg-surface-700 dark:hover:text-primary-light">
+            <button 
+              className="relative rounded-full p-2 text-surface-600 hover:bg-surface-100 hover:text-primary dark:text-surface-300 dark:hover:bg-surface-700 dark:hover:text-primary-light"
+              onClick={() => navigate('/cart')}
+              aria-label="Shopping Cart"
+            >
               <ShoppingCartIcon className="h-5 w-5" />
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs text-white">0</span>
+              <span className="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs text-white">{cartItems.length}</span>
             </button>
 
             {/* User profile dropdown */}
@@ -117,7 +168,7 @@ export default function Home() {
             >
               <UserIcon className="h-5 w-5" />
               
-              {/* User dropdown menu */}
+              {/* User dropdown menu - conditionally rendered and properly imported */}
               {showUserMenu && (
                 <UserDropdown />
               )}
@@ -164,9 +215,10 @@ export default function Home() {
               <ul className="flex flex-col space-y-2">
                 {['Home', 'Shop', 'Categories', 'Deals', 'About'].map((item) => (
                   <li key={item}>
-                    <a 
-                      href="#" 
+                    <Link 
+                      to={navigationPaths[item] || '#'}
                       className="block rounded-lg p-2 text-surface-600 hover:bg-surface-100 hover:text-primary dark:text-surface-300 dark:hover:bg-surface-700 dark:hover:text-primary-light"
+                      onClick={() => handleNavigation(navigationPaths[item] || '#')}
                     >
                       {item}
                     </a>
@@ -208,8 +260,8 @@ export default function Home() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3, duration: 0.4 }}
                 >
-                  <a href="#feature" className="btn-primary">Shop Now</a>
-                  <a href="#" className="btn border-2 border-white bg-transparent text-white hover:bg-white hover:text-primary">View Deals</a>
+                  <Link to="/shop" className="btn-primary">Shop Now</Link>
+                  <Link to="/deals" className="btn border-2 border-white bg-transparent text-white hover:bg-white hover:text-primary">View Deals</Link>
                 </motion.div>
               </div>
               <motion.div 
