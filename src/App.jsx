@@ -18,7 +18,6 @@ import Contact from './pages/Contact';
 import Careers from './pages/Careers';
 import ReturnPolicy from './pages/ReturnPolicy';
 import ShippingInfo from './pages/ShippingInfo';
-import Newsletter from './pages/Newsletter';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import DashboardLayout from './pages/Dashboard/DashboardLayout';
