@@ -178,7 +178,11 @@ export default function Home() {
           <div className="grid gap-8 md:grid-cols-4">
             <div>
               <div className="mb-4 flex items-center gap-2 text-xl font-bold text-white">
-                <ShoppingCartIcon className="h-6 w-6" />
+                {/* Get ShoppingCart icon using the getIcon utility function */}
+                {(() => {
+                  const CartIcon = getIcon('ShoppingCart');
+                  return <CartIcon className="h-6 w-6" />;
+                })()}
                 <span>ShopStream</span>
               </div>
               <p className="mb-4 text-surface-400">
