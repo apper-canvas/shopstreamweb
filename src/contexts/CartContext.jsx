@@ -6,6 +6,7 @@ const CartContext = createContext(null);
 export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [lastOrderId, setLastOrderId] = useState(null);
 
   // Load cart items from localStorage
   useEffect(() => {
@@ -119,9 +120,43 @@ export function CartProvider({ children }) {
       toast.warning("Your cart is empty");
       return false;
     }
-    
-    toast.success("Proceeding to checkout!");
+
+    toast.info("Proceeding to checkout");
     return true;
+  };
+
+  // Place order function
+  const placeOrder = (shippingInfo, paymentInfo) => {
+    if (cartItems.length === 0) {
+      toast.warning("Your cart is empty");
+      return { success: false };
+    }
+
+    try {
+      // In a real app, this would send the order to a backend service
+      // For now, we'll just generate a random order ID and clear the cart
+      const orderId = `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+      
+      // Create order object
+      const order = {
+        id: orderId,
+        items: [...cartItems],
+        shippingInfo,
+        paymentInfo,
+        subtotal: getCartSubtotal(),
+        tax: getCartTax(),
+        total: getCartTotal(),
+        date: new Date().toISOString()
+      };
+      
+      // Store order data in localStorage for demo purposes
+      localStorage.setItem(`order_${orderId}`, JSON.stringify(order));
+      setLastOrderId(orderId);
+      return { success: true, orderId };
+    } catch (error) {
+      toast.error("Failed to place order. Please try again.");
+      return { success: false, error };
+    }
   };
 
   const value = {
@@ -135,7 +170,9 @@ export function CartProvider({ children }) {
     getCartSubtotal,
     getCartTax,
     getCartTotal,
-    checkout
+    checkout,
+    placeOrder,
+    lastOrderId
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

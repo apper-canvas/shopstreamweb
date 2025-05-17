@@ -33,19 +33,10 @@ export default function Cart() {
       return;
     }
     
-    setProcessingCheckout(true);
-    
-    // Simulate a processing delay
-    setTimeout(() => {
-      const success = checkout();
-      if (success) {
-        // In a real app, you would redirect to a checkout page
-        // For now, we'll just clear the cart and show a success message
-        clearCart();
-        navigate('/');
-      }
-      setProcessingCheckout(false);
-    }, 1500);
+    const success = checkout();
+    if (success) {
+      navigate('/checkout');
+    }
   };
   
   const subtotal = getCartSubtotal();
