@@ -87,7 +87,7 @@ const AdminRoute = ({ children }) => {
 };
 
 // Main layout component with sticky header and footer
-const MainLayout = () => {
+    const redirectPath = isAuthenticated ? '/dashboard' : '/login';
   const [email, setEmail] = useState('');
   const { user, isAuthenticated } = useSelector((state) => state.user);
   const handleSubscribe = (e) => {
@@ -95,7 +95,7 @@ const MainLayout = () => {
     
     // Email validation
     if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-      toast.error("Please enter a valid email address");
+const MainLayout = ({ children }) => {
       return;
     }
     
@@ -132,7 +132,7 @@ const MainLayout = () => {
       </header>
       
       {/* Main Content */}
-      <main className="flex-grow">{children || <Outlet />}</main>
+      <main className="flex-grow">{children ? children : <Outlet />}</main>
       
       {/* Sticky Footer */}
       <footer className="bg-surface-800 text-white dark:bg-surface-900">
