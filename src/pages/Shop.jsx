@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useSearchParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import { getIcon } from '../utils/iconUtils';
+import { fetchProducts } from '../services/productService';
 
 const FilterIcon = getIcon('Filter');
 const SearchIcon = getIcon('Search');
@@ -13,66 +15,29 @@ export default function Shop() {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterOpen, setFilterOpen] = useState(false);
   const [searchParams] = useSearchParams();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const categoryParam = searchParams.get('category');
+  const [categoryName, setCategoryName] = useState('');
   
-  // Sample product data
-  const products = [
-    { 
-      id: 1, 
-      name: 'Wireless Earbuds', 
-      price: 79.99, 
-      image: 'https://burst.shopifycdn.com/photos/wireless-earbuds-in-charger.jpg',
-      category: 'Electronics'
-    },
-    { 
-      id: 2, 
-      name: 'Smart Watch', 
-      price: 149.99, 
-      image: 'https://burst.shopifycdn.com/photos/wrist-watch.jpg',
-      category: 'Electronics'
-    },
-    { 
-      id: 3, 
-      name: 'Leather Backpack', 
-      price: 89.99, 
-      image: 'https://burst.shopifycdn.com/photos/leather-bag-gray.jpg',
-      category: 'Fashion'
-    },
-    { 
-      id: 4, 
-      name: 'Desk Lamp', 
-      price: 49.99, 
-      image: 'https://burst.shopifycdn.com/photos/modern-lamp.jpg',
-      category: 'Home'
-    },
-    { 
-      id: 5, 
-      name: 'Coffee Maker', 
-      price: 119.99, 
-      image: 'https://burst.shopifycdn.com/photos/a-cup-of-coffee-on-wood.jpg',
-      category: 'Home'
-    },
-    { 
-      id: 6, 
-      name: 'Running Shoes', 
-      price: 129.99, 
-      image: 'https://burst.shopifycdn.com/photos/running-shoes.jpg',
-      category: 'Sports'
-    },
-    { 
-      id: 7, 
-      name: 'Bluetooth Speaker', 
-      price: 89.99, 
-      image: 'https://burst.shopifycdn.com/photos/bluetooth-speaker.jpg',
-      category: 'Electronics'
-    },
-    { 
-      id: 8, 
-      name: 'Yoga Mat', 
-      price: 42.99, 
-      image: 'https://burst.shopifycdn.com/photos/work-at-home-yoga.jpg',
-      category: 'Sports'
-    }
-  ];
+  // Load products from database
+  useEffect(() => {
+    const loadProducts = async () => {
+      try {
+        setLoading(true);
+        const productsData = await fetchProducts({}, 1, 20);
+        setProducts(productsData);
+      } catch (error) {
+        console.error('Error loading products:', error);
+        toast.error('Failed to load products. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadProducts();
+  }, []);
 
   // Category mapping from numeric ID to category name
   const categoryMapping = {
@@ -103,9 +68,6 @@ export default function Shop() {
   };
 
   // Filter products based on category from URL parameter
-  const [filteredProducts, setFilteredProducts] = useState(products);
-  const categoryParam = searchParams.get('category');
-  const [categoryName, setCategoryName] = useState('');
 
   useEffect(() => {
     if (categoryParam) { 
@@ -130,11 +92,19 @@ export default function Shop() {
     } else {
       setFilteredProducts(products);
     }
-  }, [categoryParam]);
+  }, [categoryParam, products]);
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // Search functionality would be implemented here
+    if (searchQuery.trim()) {
+      const filtered = products.filter(product => 
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
+      setFilteredProducts(filtered);
+    } else {
+      setFilteredProducts(products);
+    }
   };
 
   const toggleFilter = () => {
@@ -142,6 +112,17 @@ export default function Shop() {
   };
 
   return (
+    <div className="min-h-screen bg-surface-50 transition-colors dark:bg-surface-900">
+      <main className="container mx-auto px-4 py-8">
+        <h1 className="mb-6 text-3xl font-bold text-surface-800 dark:text-white">{categoryName || (categoryParam ? `Category ${categoryParam}` : 'Shop')}</h1>
+        
+        {loading ? (
+          <div className="flex min-h-[300px] items-center justify-center">
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+            <p className="ml-3 text-lg text-surface-600 dark:text-surface-400">Loading products...</p>
+          </div>
+        ) : (
+          <>
     <div className="min-h-screen bg-surface-50 transition-colors dark:bg-surface-900">
       <main className="container mx-auto px-4 py-8">
         <h1 className="mb-6 text-3xl font-bold text-surface-800 dark:text-white">{categoryName || (categoryParam ? `Category ${categoryParam}` : 'Shop')}</h1>
@@ -180,19 +161,61 @@ export default function Shop() {
         <div className={`grid gap-6 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4' : 'grid-cols-1'}`}>
           {filteredProducts.map((product) => (
             <Link key={product.id} to={`/product/${product.id}`} className="group overflow-hidden rounded-lg bg-white shadow-soft transition-all hover:shadow-md dark:bg-surface-800">
-              <div className={`${viewMode === 'grid' ? 'aspect-square w-full' : 'flex h-40'}`}>
-                <img src={product.image} alt={product.name} className={`h-full w-full object-cover transition-transform duration-300 ${viewMode === 'grid' ? 'group-hover:scale-105' : 'w-40'}`} />
-                <div className={`flex flex-col justify-between p-4 ${viewMode === 'list' ? 'flex-1' : ''}`}>
-                  <div>
+              {viewMode === 'grid' ? (
+                <>
+                  <div className="aspect-square w-full overflow-hidden">
+                    <img 
+                      src={product.images && product.images.length > 0 ? product.images[0] : 'https://placehold.co/400x400/111827/FFFFFF?text=No+Image'} 
+                      alt={product.name} 
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      onError={(e) => {
+                        e.target.src = 'https://placehold.co/400x400/111827/FFFFFF?text=No+Image';
+                      }}
+                    />
+                  </div>
+                  <div className="p-4">
                     <p className="text-sm text-surface-500 dark:text-surface-400">{product.category}</p>
                     <h3 className="text-lg font-semibold text-surface-800 dark:text-white">{product.name}</h3>
+                    <p className="mt-2 text-xl font-bold text-primary">${product.price.toFixed(2)}</p>
                   </div>
-                  <p className="text-xl font-bold text-primary">${product.price.toFixed(2)}</p>
+                </>
+              ) : (
+                <div className="flex h-40">
+                  <img 
+                    src={product.images && product.images.length > 0 ? product.images[0] : 'https://placehold.co/200x200/111827/FFFFFF?text=No+Image'} 
+                    alt={product.name} 
+                    className="h-full w-40 object-cover"
+                    onError={(e) => {
+                      e.target.src = 'https://placehold.co/200x200/111827/FFFFFF?text=No+Image';
+                    }}
+                  />
+                  <div className="flex flex-1 flex-col justify-between p-4">
+                    <div>
+                      <p className="text-sm text-surface-500 dark:text-surface-400">{product.category}</p>
+                      <h3 className="text-lg font-semibold text-surface-800 dark:text-white">{product.name}</h3>
+                      {product.description && (
+                        <p className="mt-1 line-clamp-2 text-sm text-surface-600 dark:text-surface-400">
+                          {product.description}
+                        </p>
+                      )}
+                    </div>
+                    <p className="text-xl font-bold text-primary">${product.price.toFixed(2)}</p>
+                  </div>
                 </div>
-              </div>
+              )}
             </Link>
           ))}
         </div>
+         
+        {filteredProducts.length === 0 && !loading && (
+          <div className="mt-8 text-center">
+            <p className="text-lg text-surface-600 dark:text-surface-400">
+              No products found. Try adjusting your search criteria.
+            </p>
+          </div>
+        )}
+        </>
+        )}
       </main>
     </div>
   );

@@ -59,10 +59,15 @@ export default function Home() {
     <div className="group relative overflow-hidden rounded-lg bg-white shadow-md transition-all hover:shadow-lg dark:bg-surface-800">
       <Link to={`/product/${product.id}`} className="block">
         <div className="relative aspect-[4/3] overflow-hidden">
-          <img 
-            src={product.images[0] || 'https://via.placeholder.com/400x300?text=No+Image'} 
-            alt={product.name}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          <img
+            src={product.images && product.images.length > 0 
+              ? product.images[0] 
+              : 'https://placehold.co/400x300/111827/FFFFFF?text=No+Image'}
+            alt={product.name} 
+            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" 
+            onError={(e) => {
+              e.target.src = 'https://placehold.co/400x300/111827/FFFFFF?text=No+Image';
+            }}
           />
           {product.inventory < 10 && (
             <span className="absolute left-2 top-2 rounded-full bg-red-500 px-2 py-1 text-xs font-semibold text-white">

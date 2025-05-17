@@ -93,7 +93,7 @@ export const fetchProducts = async (filters = {}, page = 1, limit = 20) => {
         category: item.category,
         sku: item.sku,
         featured: item.featured,
-        images: item.images ? item.images.split(',') : [],
+        images: parseProductImages(item.images),
         rating: item.rating || 0,
         reviews: item.reviews || 0,
         tags: item.Tags || []
@@ -134,7 +134,7 @@ export const fetchProductById = async (productId) => {
         category: product.category,
         sku: product.sku,
         featured: product.featured,
-        images: product.images ? product.images.split(',') : [],
+        images: parseProductImages(product.images),
         rating: product.rating || 0,
         reviews: product.reviews || 0,
         tags: product.Tags || []
@@ -144,5 +144,20 @@ export const fetchProductById = async (productId) => {
   } catch (error) {
     console.error('Error fetching product by ID:', error);
     throw error;
+  }
+};
+
+/**
+ * Helper function to parse product images string into array of URLs
+ * @param {string} imagesString - Comma-separated image URLs or JSON string
+ * @returns {Array} - Array of image URLs
+ */
+const parseProductImages = (imagesString) => {
+  if (!imagesString) return [];
+  
+  try {
+    return imagesString.split(',').map(url => url.trim()).filter(url => url);
+  } catch (error) {
+    return [];
   }
 };
