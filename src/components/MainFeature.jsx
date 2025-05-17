@@ -167,11 +167,21 @@ export default function MainFeature() {
   // State for showing filters on mobile
   const [showFilters, setShowFilters] = useState(false);
   
+  // State to track screen width
+  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 1024);
+  
   // State for sort option
   const [sortOption, setSortOption] = useState("featured");
   
   // State for filtered and sorted products
   const [displayedProducts, setDisplayedProducts] = useState(initialProducts);
+  
+  // Track window resize for responsive design
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   // State for selected product size (when applicable)
   const [selectedSizes, setSelectedSizes] = useState({});
@@ -235,7 +245,7 @@ export default function MainFeature() {
     // Apply sorting
     switch (sortOption) {
       case "featured":
-        result.sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0));
+        result.sort((a, b) => (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0) * -1);
         break;
       case "priceAsc":
         result.sort((a, b) => (a.salePrice || a.price) - (b.salePrice || b.price));
@@ -350,7 +360,7 @@ export default function MainFeature() {
       <div className="flex flex-col lg:flex-row lg:gap-6">
         {/* Filters - desktop (always visible) and mobile (conditional) */}
         <AnimatePresence>
-          {(showFilters || window.innerWidth >= 1024) && (
+          {(showFilters || isDesktop) && (
             <motion.aside 
               className={`mb-6 w-full rounded-xl bg-white p-4 shadow-soft dark:bg-surface-800 lg:mb-0 lg:w-64 lg:flex-shrink-0 ${!showFilters && 'hidden lg:block'}`}
               initial={{ opacity: 0, height: 0 }}
