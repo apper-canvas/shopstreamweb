@@ -57,7 +57,6 @@ export default function SavedAddresses() {
       state: '',
       zipCode: '',
       country: 'United States',
-      country: 'United States', 
       isDefault: false
     });
     });
